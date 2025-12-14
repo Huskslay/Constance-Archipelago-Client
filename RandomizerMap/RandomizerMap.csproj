@@ -42,6 +42,9 @@
 		<Reference Include="RandomizerCore">
 			<HintPath>..\RandomizerCore\bin\Debug\netstandard2.1\RandomizerCore.dll</HintPath>
 		</Reference>
+		<Reference Include="Randomizer">
+			<HintPath>..\Randomizer\bin\Debug\netstandard2.1\Randomizer.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 
 	<ItemGroup>

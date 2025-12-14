@@ -84,7 +84,7 @@ public static class RandomSearch
 
             while (important.Count > 0)
             {
-                reachable = GetReachableUnrandodLocations(ref randoMap, foundItems, foundEvents, newFoundCousins, start, out EventsEntries reachedEvents);
+                reachable = GetReachableLocations(foundItems, foundEvents, newFoundCousins, start, (loc) => ShouldSkipLocation(loc, randoMap), out EventsEntries reachedEvents);
                 if (reachable.Count == 0) break;
 
                 int chosenReachable = rand.Next(reachable.Count);
@@ -109,7 +109,7 @@ public static class RandomSearch
 
 
             finalSearch = true;
-            reachable = GetReachableUnrandodLocations(ref randoMap, foundItems, foundEvents, newFoundCousins, start, out _);
+            reachable = GetReachableLocations(foundItems, foundEvents, newFoundCousins, start, (loc) => ShouldSkipLocation(loc, randoMap), out _);
             finalSearch = false;
 
             if (reachable.Count != toRando.Count) {
@@ -139,6 +139,10 @@ public static class RandomSearch
         } 
 
         return randoMap;
+    }
+    private static bool ShouldSkipLocation(ALocation location, Dictionary<string, RandomStateElement> randoMap)
+    {
+        return randoMap[location.GetFullName()].dest != null;
     }
 
     private static bool ValidateFoundAll(ItemEntries foundItems, EventsEntries foundEvents, int foundCousins)
@@ -171,7 +175,7 @@ public static class RandomSearch
     }
 
 
-    private static List<ALocation> GetReachableUnrandodLocations(ref Dictionary<string, RandomStateElement> randoMap, ItemEntries foundItems, EventsEntries foundEvents, int foundCousins, Transition start, out EventsEntries reachedRegionEvents)
+    public static List<ALocation> GetReachableLocations(ItemEntries foundItems, EventsEntries foundEvents, int foundCousins, Transition start, Func<ALocation, bool> shouldSkipLocation, out EventsEntries reachedRegionEvents)
     {
         RandomSearchHolder<ATransition, ALocation> search = new(start, start.GetLinkedTransition());
 
@@ -199,7 +203,7 @@ public static class RandomSearch
                 reachedRegionEvents |= TryReachEvents(foundItems, foundEvents, foundCousins, transition.GetRegion());
             }
 
-            TryReachItems(ref search, randoMap, foundItems, foundEvents, foundCousins, transition);
+            TryReachItems(ref search, foundItems, foundEvents, foundCousins, transition, shouldSkipLocation);
 
             if (log) Plugin.Logger.LogMessage("-> Transitions <-");
             AddReachableTransitions(ref search, foundItems, foundEvents, foundCousins, ref gottenToElevators, transition);
@@ -234,11 +238,11 @@ public static class RandomSearch
     }
 
     
-    private static void TryReachItems(ref RandomSearchHolder<ATransition, ALocation> search, Dictionary<string, RandomStateElement> randoMap, ItemEntries foundItems, EventsEntries foundEvents, int foundCousins, ATransition start)
+    private static void TryReachItems(ref RandomSearchHolder<ATransition, ALocation> search, ItemEntries foundItems, EventsEntries foundEvents, int foundCousins, ATransition start, Func<ALocation, bool> shouldSkipLocation)
     {
         foreach (ALocation location in start.GetRegion().GetAllLocations())
         {
-            if (randoMap[location.GetFullName()].dest != null || search.FoundContains(location)) continue;
+            if (search.FoundContains(location) || shouldSkipLocation(location)) continue;
 
             RequirementsOwner<TransitionRequirement> neededRequirements = location.GetSavedData().neededRequirements;
             ReachableState reachableState = IsReachableFromTransition(start, foundItems, foundEvents, foundCousins, neededRequirements);

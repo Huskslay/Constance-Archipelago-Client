@@ -5,9 +5,13 @@ using System.Text;
 using Constance;
 using HarmonyLib;
 using Leo;
+using Randomizer.Classes.Random.Generation;
+using RandomizerCore.Classes.Handlers;
 using RandomizerCore.Classes.Handlers.State;
 using RandomizerCore.Classes.Storage.Locations;
+using RandomizerCore.Classes.Storage.Regions;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace RandomizerMap.Patches;
 
@@ -23,13 +27,18 @@ public class CConUiMapRoot_Patch
         foreach (CConUiMapIcon icon in icons) UnityEngine.Object.Destroy(icon.gameObject);
         icons.Clear();
 
+        Region startRegion = RegionHandler.Regions.Find(x => x.GetFullName() == "V01");
+        List<ALocation> reachableLocations = RandomSearch.GetReachableLocations(
+            RandomState.Instance.FoundItems, RandomState.Instance.FoundEvents, RandomState.Instance.Cousins.Count, startRegion.transitions[0], (_) => false, out _
+        );
+
         IConUiMapSelectTarget a = __instance.iconParent.GetComponentsInChildren<IConUiMapSelectTarget>(includeInactive: true).First(x => {
             if (x.RectTransform.name != "Custom" && x.RectTransform.gameObject.TryGetComponent(out CConUiMapIcon icon))
             { return icon.icon == ConMapIcon.Shrine; } return false; });
         foreach (RandomStateElement element in RandomState.Instance.LocationMap.Values)
         {
             if (!element.isRandomized || element.hasObtainedSource) continue;
-            MakeIcon(__instance, a, element.source.GetRegion().id);
+            MakeIcon(__instance, a, element.source.GetRegion().id, reachableLocations.Contains(element.source));
         }
         
         //IConUiMapSelectTarget b = __instance.iconParent.GetComponentsInChildren<IConUiMapSelectTarget>(includeInactive: true).First(x => {
@@ -48,7 +57,7 @@ public class CConUiMapRoot_Patch
         //}
     }
 
-    private static CConUiMapIcon MakeIcon(CConUiMapRoot __instance, IConUiMapSelectTarget a, ConLevelId level)
+    private static CConUiMapIcon MakeIcon(CConUiMapRoot __instance, IConUiMapSelectTarget a, ConLevelId level, bool reachable)
     {
         CConUiMapIcon icon = UnityEngine.Object.Instantiate(a.RectTransform.gameObject).GetComponent<CConUiMapIcon>();
         IConUiMapSelectTarget target = icon.GetComponent<IConUiMapSelectTarget>();
@@ -60,8 +69,10 @@ public class CConUiMapRoot_Patch
         icon.transform.localPosition = a.RectTransform.localPosition;
         target.RectTransform.sizeDelta /= 2f;
 
+        if (!reachable) icon.image.color = Color.gray;
         icon.name = "Custom";
         icon.gameObject.SetActive(true);
+
         return icon;
     }
 }

@@ -11,6 +11,7 @@ using UnityEngine.InputSystem;
 namespace RandomizerMap;
 
 [BepInDependency("RandomizerCore", BepInDependency.DependencyFlags.HardDependency)]
+[BepInDependency("Randomizer", BepInDependency.DependencyFlags.HardDependency)]
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
 public class Plugin : BaseUnityPlugin
 {
