@@ -38,10 +38,13 @@ public static class ShrineDataHandler
 
     public static void SaveShrineData(ConSaver conSaver, ConSaveStateId id)
     {
+        if (loadedData == null) NewShrineData();
         FileSaveLoader.TrySaveClassToJson(loadedData, folder, file, id);
+        loadedData = null;
     }
     public static void LoadShrineData()
     {
+        if (loadedData != null) return;
         loadedData = FileSaveLoader.LoadClassFromJson<List<ShrineData>>(folder, file, CConSaveStateManager.LoadedSaveStateId);
         if (loadedData == null) NewShrineData();
     }
