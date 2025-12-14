@@ -4,7 +4,7 @@
 		<AssemblyName>CreateRandomizer</AssemblyName>
 		<Product>Huskslay - CreateRandomizer</Product>
 		<RootNamespace>CreateRandomizer</RootNamespace>
-		<Version>0.0.1</Version>
+		<Version>0.1.0</Version>
 
 		<GameName>Constance</GameName>
 		<SteamRefs>G:\SteamLibrary\steamapps\common</SteamRefs>
