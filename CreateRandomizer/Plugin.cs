@@ -40,7 +40,7 @@ public class Plugin : BaseUnityPlugin
 
     private void InitializeModGUI()
     {
-        modGUI = ModGUI.Create(KeyCode.Home);
+        modGUI = ModGUI.Create(KeyCode.F1);
         modGUI.AddPage<TransitionPage>();
         modGUI.AddPage<LocationPage>();
         modGUI.AddPage<RegionPage>();
@@ -49,7 +49,7 @@ public class Plugin : BaseUnityPlugin
 
     private void Update()
     {
-        if (Keyboard.current.homeKey.wasPressedThisFrame)
+        if (Keyboard.current.f1Key.wasPressedThisFrame)
         {
             modGUI.ShowGUI = !modGUI.ShowGUI;
         }
