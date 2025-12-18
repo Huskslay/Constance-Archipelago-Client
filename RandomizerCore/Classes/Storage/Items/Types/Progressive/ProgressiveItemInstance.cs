@@ -25,7 +25,7 @@ public class ProgressiveItemInstance(string name, List<string> collectables)
             return null;
         }
         locations.Add(location.GetFullName());
-        FileSaveLoader.TrySaveClassToFile(this, ProgressiveItemHandler.folderName, name);
+        FileSaveLoader.TrySaveClassToFile(this, [ProgressiveItemHandler.folderName], name);
         return new ProgressiveItem(location, name);
     }
 

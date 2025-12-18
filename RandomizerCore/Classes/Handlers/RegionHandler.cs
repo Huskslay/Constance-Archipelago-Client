@@ -45,17 +45,17 @@ public static class RegionHandler
 
         LoadRegions();
         List<ISavedDataOwner<RegionSavedData>> regions = Regions.ConvertAll(x => (ISavedDataOwner<RegionSavedData>)x);
-        LoadSavedData(ref regionSavedData, regions, regionSavedDataFolder);
+        LoadSavedData(ref regionSavedData, regions, [regionSavedDataFolder]);
 
         List<ISavedDataOwner<LocationSavedData>> locations = PrepLocations();
-        LoadSavedData(ref locationSavedData, locations, locationSavedDataFolder);
+        LoadSavedData(ref locationSavedData, locations, [locationSavedDataFolder]);
 
         List<ISavedDataOwner<TransitionSavedData>> transitions = PrepTransitions();
-        LoadSavedData(ref transitionSavedData, transitions, "Transition Saved Data");
+        LoadSavedData(ref transitionSavedData, transitions, [transitionSavedDataFolder]);
     }
     private static void LoadRegions()
     {
-        Regions = FileSaveLoader.LoadClasses<Region>("Regions");
+        Regions = FileSaveLoader.LoadClasses<Region>(["Regions"]);
 
         HashSet<string> names = [];
         foreach (Region region in Regions)
@@ -70,7 +70,7 @@ public static class RegionHandler
             }
         }
         Plugin.Logger.LogMessage($"{Regions.Count} regions found");
-        FileSaveLoader.TrySaveClassToJson(names, "Names", "Regions", logSuccess: false);
+        FileSaveLoader.TrySaveClassToJson(names, ["Names"], "Regions", logSuccess: false);
     }
     private static List<ISavedDataOwner<LocationSavedData>> PrepLocations()
     {
@@ -86,7 +86,7 @@ public static class RegionHandler
             location.Init();
         }
         Plugin.Logger.LogMessage($"{names.Count} locations found");
-        FileSaveLoader.TrySaveClassToJson(names, "Names", "Locations", logSuccess: false);
+        FileSaveLoader.TrySaveClassToJson(names, ["Names"], "Locations", logSuccess: false);
 
         return locations.ConvertAll(x => (ISavedDataOwner<LocationSavedData>)x);
     }
@@ -112,13 +112,13 @@ public static class RegionHandler
             names.Add(transition.GetFullName());
         }
         Plugin.Logger.LogMessage($"{names.Count} transitions found");
-        FileSaveLoader.TrySaveClassToJson(names, "Names", "Transitions", logSuccess: false);
+        FileSaveLoader.TrySaveClassToJson(names, ["Names"], "Transitions", logSuccess: false);
         return saved;
     }
 
-    private static void LoadSavedData<T>(ref List<T> savedDatas, List<ISavedDataOwner<T>> owners, string folder) where T : SavedData
+    private static void LoadSavedData<T>(ref List<T> savedDatas, List<ISavedDataOwner<T>> owners, List<string> folders) where T : SavedData
     {
-        savedDatas = FileSaveLoader.LoadClassesJson<T>(folder);
+        savedDatas = FileSaveLoader.LoadClassesJson<T>(folders);
 
         HashSet<string> names = [];
         foreach (T savedData in savedDatas)
@@ -149,19 +149,19 @@ public static class RegionHandler
     }
     public static void SaveRegion(Region region, bool log)
     {
-        FileSaveLoader.TrySaveClassToJson(region, regionDataFolder, region.GetFullName(), logSuccess: log);
+        FileSaveLoader.TrySaveClassToJson(region, [regionDataFolder], region.GetFullName(), logSuccess: log);
     }
     public static void SaveSaveData(RegionSavedData data, bool log)
     {
-        FileSaveLoader.TrySaveClassToJson(data, regionSavedDataFolder, data.GetConnection(), logSuccess: log);
+        FileSaveLoader.TrySaveClassToJson(data, [regionSavedDataFolder], data.GetConnection(), logSuccess: log);
     }
     public static void SaveSaveData(TransitionSavedData data, bool log)
     {
-        FileSaveLoader.TrySaveClassToJson(data, transitionSavedDataFolder, data.GetConnection(), logSuccess: log);
+        FileSaveLoader.TrySaveClassToJson(data, [transitionSavedDataFolder], data.GetConnection(), logSuccess: log);
     }
     public static void SaveSaveData(LocationSavedData data, bool log)
     {
-        FileSaveLoader.TrySaveClassToJson(data, locationSavedDataFolder, data.GetConnection(), logSuccess: log);
+        FileSaveLoader.TrySaveClassToJson(data, [locationSavedDataFolder], data.GetConnection(), logSuccess: log);
     }
 
 

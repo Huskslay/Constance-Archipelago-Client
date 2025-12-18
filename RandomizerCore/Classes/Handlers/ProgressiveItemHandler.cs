@@ -15,7 +15,7 @@ public static class ProgressiveItemHandler
 
     public static void Init()
     {
-        Instances = FileSaveLoader.LoadClasses<ProgressiveItemInstance>(folderName);
+        Instances = FileSaveLoader.LoadClasses<ProgressiveItemInstance>([folderName]);
 
         HashSet<string> names = [];
         foreach (ProgressiveItemInstance instance in Instances)
@@ -31,7 +31,7 @@ public static class ProgressiveItemHandler
             }
         }
         Plugin.Logger.LogMessage($"{Instances.Count} progressive item instances found");
-        FileSaveLoader.TrySaveClassToJson(names, "Names", folderName, logSuccess: false);
+        FileSaveLoader.TrySaveClassToJson(names, ["Names"], folderName, logSuccess: false);
     }
 
 

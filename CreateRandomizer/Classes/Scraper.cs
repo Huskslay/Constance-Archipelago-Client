@@ -68,7 +68,7 @@ public class Scraper : MonoBehaviour
             if (!Running) break;
         }
 
-        FileSaveLoader.TrySaveClassToJson(hasShrines, "Names", "Shrine Maps");
+        FileSaveLoader.TrySaveClassToJson(hasShrines, ["Names"], "Shrine Maps");
 
 
         RegionHandler.Init();

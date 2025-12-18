@@ -14,17 +14,17 @@ public static class FileSaveLoader
     private static readonly string ext = "cls";
     private static readonly string jsonExt = "json";
 
-    public static List<T> LoadClasses<T>(string folder, ConSaveStateId? id = null)
+    public static List<T> LoadClasses<T>(List<string> folders, ConSaveStateId? id = null)
     {
-        return LoadClassesInner(folder, LoadClassFromFile<T>, ext, id);
+        return LoadClassesInner(folders, LoadClassFromFile<T>, ext, id);
     }
-    public static List<T> LoadClassesJson<T>(string folder, ConSaveStateId? id = null)
+    public static List<T> LoadClassesJson<T>(List<string> folders, ConSaveStateId? id = null)
     {
-        return LoadClassesInner(folder, LoadClassFromJson<T>, jsonExt, id);
+        return LoadClassesInner(folders, LoadClassFromJson<T>, jsonExt, id);
     }
-    private static List<T> LoadClassesInner<T>(string folder, Func<string, string, ConSaveStateId?, T> loader, string extension, ConSaveStateId? id = null)
+    private static List<T> LoadClassesInner<T>(List<string> folders, Func<List<string>, string, ConSaveStateId?, T> loader, string extension, ConSaveStateId? id = null)
     {
-        string path = GetFolderPath(id, folder);
+        string path = GetFolderPath(id, folders);
         if (path == null)
         {
             Plugin.Logger.LogError("An error occured loading class when getting directory");
@@ -39,14 +39,14 @@ public static class FileSaveLoader
             return clses;
         }
 
-        foreach (string file in Directory.EnumerateFiles(path, $"*.{extension}")) clses.Add(loader(folder, Path.GetFileNameWithoutExtension(file), id));
+        foreach (string file in Directory.EnumerateFiles(path, $"*.{extension}")) clses.Add(loader(folders, Path.GetFileNameWithoutExtension(file), id));
 
         return clses;
     }
 
-    public static bool TrySaveClassToFile<T>(T cls, string folder, string fileName, ConSaveStateId? id = null, bool logSuccess = true)
+    public static bool TrySaveClassToFile<T>(T cls, List<string> folders, string fileName, ConSaveStateId? id = null, bool logSuccess = true)
     {
-        string path = GetFilePath(id, folder, fileName, ext, createDir: true);
+        string path = GetFilePath(id, folders, fileName, ext, createDir: true);
         if (path == null)
         {
             Plugin.Logger.LogError("An error occured saving class when getting directory");
@@ -69,9 +69,9 @@ public static class FileSaveLoader
         }
         return false;
     }
-    public static T LoadClassFromFile<T>(string folder, string fileName, ConSaveStateId? id = null)
+    public static T LoadClassFromFile<T>(List<string> folders, string fileName, ConSaveStateId? id = null)
     {
-        string path = GetFilePath(id, folder, fileName, ext);
+        string path = GetFilePath(id, folders, fileName, ext);
         if (path == null)
         {
             Plugin.Logger.LogError("An error occured loading class when getting directory");
@@ -97,7 +97,7 @@ public static class FileSaveLoader
     }
 
 
-    public static bool TrySaveClassToJson<T>(T cls, string folder, string fileName, ConSaveStateId? id = null, bool logSuccess = true, ConSaver conSaver = null)
+    public static bool TrySaveClassToJson<T>(T cls, List<string> folder, string fileName, ConSaveStateId? id = null, bool logSuccess = true, ConSaver conSaver = null)
     {
         string path = GetFilePath(id, folder, fileName, jsonExt, createDir: true, conSaver: conSaver);
         if (path == null)
@@ -125,11 +125,11 @@ public static class FileSaveLoader
         }
         return false;
     }
-    public static T LoadClassFromJson<T>(string folder, string fileName, ConSaveStateId? id = null)
+    public static T LoadClassFromJson<T>(List<string> folders, string fileName, ConSaveStateId? id = null)
     {
         T cls = default;
 
-        string path = GetFilePath(id, folder, fileName, jsonExt);
+        string path = GetFilePath(id, folders, fileName, jsonExt);
         if (path == null)
         {
             Plugin.Logger.LogError("An error occured loading class when getting directory");
@@ -159,24 +159,24 @@ public static class FileSaveLoader
     }
 
 
-    public static bool ClassExistsInFile(string folder, string fileName, ConSaveStateId? id = null)
+    public static bool ClassExistsInFile(List<string> folders, string fileName, ConSaveStateId? id = null)
     {
-        string path = GetFilePath(id, folder, fileName, ext);
+        string path = GetFilePath(id, folders, fileName, ext);
         return File.Exists(path);
     }
-    public static void DeleteClassInFile(string folder, string fileName, ConSaveStateId? id = null)
+    public static void DeleteClassInFile(List<string> folders, string fileName, ConSaveStateId? id = null)
     {
-        string path = GetFilePath(id, folder, fileName, ext);
+        string path = GetFilePath(id, folders, fileName, ext);
         File.Delete(path);
     }
-    public static bool ClassExistsInJson(string folder, string fileName, ConSaveStateId? id = null)
+    public static bool ClassExistsInJson(List<string> folders, string fileName, ConSaveStateId? id = null)
     {
-        string path = GetFilePath(id, folder, fileName, jsonExt);
+        string path = GetFilePath(id, folders, fileName, jsonExt);
         return File.Exists(path);
     }
-    public static void DeleteClassInJson(string folder, string fileName, ConSaveStateId? id = null)
+    public static void DeleteClassInJson(List<string> folders, string fileName, ConSaveStateId? id = null)
     {
-        string path = GetFilePath(id, folder, fileName, jsonExt);
+        string path = GetFilePath(id, folders, fileName, jsonExt);
         File.Delete(path);
     }
 
@@ -198,17 +198,18 @@ public static class FileSaveLoader
 
         return conSaver.BuildSaveDir((ConSaveStateId)id).ToString();
     }
-    private static string GetFolderPath(ConSaveStateId? id, string folder, bool createDir = false, ConSaver conSaver = null)
+    private static string GetFolderPath(ConSaveStateId? id, List<string> folders, bool createDir = false, ConSaver conSaver = null)
     {
         string dir = SaveIdToDir(id, conSaver);
         if (dir == null) return null;
-        string path = Path.Combine(dir, folder);
+        string path = dir;
+        foreach (string folder in folders) path = Path.Combine(path, folder);
         if (createDir) Directory.CreateDirectory(path);
         return path;
     }
-    public static string GetFilePath(ConSaveStateId? id, string folder, string fileName, string ext, bool createDir = false, ConSaver conSaver = null)
+    public static string GetFilePath(ConSaveStateId? id, List<string> folders, string fileName, string ext, bool createDir = false, ConSaver conSaver = null)
     {
-        string folderPath = GetFolderPath(id, folder, createDir, conSaver);
+        string folderPath = GetFolderPath(id, folders, createDir, conSaver);
         if (folderPath == null) return null;
         return Path.Combine(folderPath, fileName + $".{ext}");
     }

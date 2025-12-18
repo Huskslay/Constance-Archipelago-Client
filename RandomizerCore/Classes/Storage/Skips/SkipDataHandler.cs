@@ -12,7 +12,7 @@ public static class SkipDataHandler
 
     public static void Init()
     {
-        skipDatas = FileSaveLoader.LoadClassesJson<SkipData>(folder);
+        skipDatas = FileSaveLoader.LoadClassesJson<SkipData>([folder]);
         foreach (SkipEntries skip in Enum.GetValues(typeof(SkipEntries)))
         {
             if (skip == SkipEntries.None || skip == SkipEntries.All) continue;
@@ -52,6 +52,6 @@ public static class SkipDataHandler
 
     public static void SaveSkipData(SkipData data, bool log)
     {
-        FileSaveLoader.TrySaveClassToJson(data, folder, data.skip.ToString(), logSuccess: log);
+        FileSaveLoader.TrySaveClassToJson(data, [folder], data.skip.ToString(), logSuccess: log);
     }
 }

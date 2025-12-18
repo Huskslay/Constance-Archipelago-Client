@@ -10,7 +10,7 @@ namespace Randomizer.Classes.Random;
 
 public static class RandomFiles
 {
-    private static readonly string folder = "Mods";
+    private static readonly List<string> folders = ["Mods"];
     private static readonly string file = "Rando Data";
     private static readonly string spoiler = "Rando Spoiler";
 
@@ -29,13 +29,13 @@ public static class RandomFiles
     {
         if (!RandomState.Randomized) return;
         SerializeState current = SerializeState.Constructor(RandomState.Instance);
-        FileSaveLoader.TrySaveClassToJson(current, folder, file, id == null ? CConSaveStateManager.LoadedSaveStateId : id, conSaver: conSaver);
+        FileSaveLoader.TrySaveClassToJson(current, folders, file, id == null ? CConSaveStateManager.LoadedSaveStateId : id, conSaver: conSaver);
     }
     public static SerializeState Load()
     {
-        if (FileSaveLoader.ClassExistsInJson(folder, file, id: RandomLoader.chosenSlotId))
+        if (FileSaveLoader.ClassExistsInJson(folders, file, id: RandomLoader.chosenSlotId))
         {
-            SerializeState current = FileSaveLoader.LoadClassFromJson<SerializeState>(folder, file, id: RandomLoader.chosenSlotId);
+            SerializeState current = FileSaveLoader.LoadClassFromJson<SerializeState>(folders, file, id: RandomLoader.chosenSlotId);
             if (current != null)
             {
                 Plugin.Logger.LogMessage("Loaded randomizer");
@@ -48,8 +48,8 @@ public static class RandomFiles
     }
     public static void Delete(ConSaver saver, ConSaveStateId id)
     {
-        if (FileSaveLoader.ClassExistsInJson(folder, file, id: id))
-            FileSaveLoader.DeleteClassInJson(folder, file, id: id);
+        if (FileSaveLoader.ClassExistsInJson(folders, file, id: id))
+            FileSaveLoader.DeleteClassInJson(folders, file, id: id);
     }
 
 
@@ -65,12 +65,12 @@ public static class RandomFiles
         SerializeState current = SerializeState.Constructor(RandomState.Instance);
 
         generator.GenerateRandom(current.seed, current.includedItems, current.includedSkips, ItemEntries.None, EventsEntries.None, out List<Spoiler> spoilerLog, current);
-        if (!FileSaveLoader.TrySaveClassToJson(spoilerLog, folder, spoiler, CConSaveStateManager.LoadedSaveStateId, logSuccess: false))
+        if (!FileSaveLoader.TrySaveClassToJson(spoilerLog, folders, spoiler, CConSaveStateManager.LoadedSaveStateId, logSuccess: false))
         {
             Plugin.Logger.LogWarning("Error occured when saving the spoiler");
             return;
         }
         Plugin.Logger.LogMessage($"Saved spoiler log to save directory: ${FileSaveLoader.GetFilePath(
-            CConSaveStateManager.LoadedSaveStateId, folder, spoiler, ".json")}");
+            CConSaveStateManager.LoadedSaveStateId, folders, spoiler, ".json")}");
     }
 }

@@ -6,7 +6,7 @@ namespace ShrineWarp.Classes;
 
 public static class ShrineDataHandler
 {
-    private static readonly string folder = "Mods";
+    private static readonly List<string> folders = ["Mods"];
     private static readonly string file = "Shrine Warp";
 
     public static List<ShrineData> loadedData = null;
@@ -35,13 +35,13 @@ public static class ShrineDataHandler
     public static void SaveShrineData(ConSaver conSaver, ConSaveStateId id)
     {
         if (loadedData == null) NewShrineData();
-        FileSaveLoader.TrySaveClassToJson(loadedData, folder, file, id);
+        FileSaveLoader.TrySaveClassToJson(loadedData, folders, file, id);
         loadedData = null;
     }
     public static void LoadShrineData()
     {
         if (loadedData != null) return;
-        loadedData = FileSaveLoader.LoadClassFromJson<List<ShrineData>>(folder, file, CConSaveStateManager.LoadedSaveStateId);
+        loadedData = FileSaveLoader.LoadClassFromJson<List<ShrineData>>(folders, file, CConSaveStateManager.LoadedSaveStateId);
         if (loadedData == null) NewShrineData();
     }
     private static void NewShrineData()
@@ -57,8 +57,8 @@ public static class ShrineDataHandler
     }
     public static void DeleteShrineData(ConSaver conSaver, ConSaveStateId id)
     {
-        if (FileSaveLoader.ClassExistsInJson(folder, file, id: id))
-            FileSaveLoader.DeleteClassInJson(folder, file, id: id);
+        if (FileSaveLoader.ClassExistsInJson(folders, file, id: id))
+            FileSaveLoader.DeleteClassInJson(folders, file, id: id);
     }
 
 }
