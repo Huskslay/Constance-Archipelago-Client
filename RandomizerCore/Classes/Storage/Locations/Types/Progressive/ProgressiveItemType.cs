@@ -2,6 +2,8 @@
 
 public enum ProgressiveItemType
 {
-    Tears = 0
+    Tears = 0,
+    FoundryPipes = 1,
+    CarnivalEyes = 2
 }
 

@@ -52,29 +52,32 @@ public static class RegionLivePatcher
 
 
         List<CConCurrencyDepositEntity> deposits =
-            [.. UnityEngine.Object.FindObjectsByType<CConCurrencyDepositEntity>(DepositLocationFactory.FindInactive, FindObjectsSortMode.None)];
+            [.. Plugin.FindObjectsByType<CConCurrencyDepositEntity>(DepositLocationFactory.FindInactive, FindObjectsSortMode.None)];
         DepositLocationFactory.PatchLoadedLevel(deposits, region.lightStoneLocations, region.currencyFlowerLocations);
 
         List<CConChestEntity> chests =
-            [.. UnityEngine.Object.FindObjectsByType<CConChestEntity>(ChestLocation.FindInactive, FindObjectsSortMode.None)];
+            [.. Plugin.FindObjectsByType<CConChestEntity>(ChestLocation.FindInactive, FindObjectsSortMode.None)];
         ChestLocation.PatchLoadedLevel(chests, region.chestLocations);
 
         List<CConUnlockAbilityCanvas> canvases =
-            [.. UnityEngine.Object.FindObjectsByType<CConUnlockAbilityCanvas>(CanvasLocation.FindInactive, FindObjectsSortMode.None)];
+            [.. Plugin.FindObjectsByType<CConUnlockAbilityCanvas>(CanvasLocation.FindInactive, FindObjectsSortMode.None)];
         CanvasLocation.PatchLoadedLevel(canvases, region.canvasLocations);
 
         List<CConInspirationTriggerBehaviour> inspirations =
-            [.. UnityEngine.Object.FindObjectsByType<CConInspirationTriggerBehaviour>(InspirationLocation.FindInactive, FindObjectsSortMode.None)];
+            [.. Plugin.FindObjectsByType<CConInspirationTriggerBehaviour>(InspirationLocation.FindInactive, FindObjectsSortMode.None)];
         InspirationLocation.PatchLoadedLevel(inspirations, region.inspirationLocations);
 
-        CConUiPanel_Shop shop = UnityEngine.Object.FindFirstObjectByType<CConUiPanel_Shop>(FindObjectsInactive.Include);
+        CConUiPanel_Shop shop = Plugin.FindFirstObjectByType<CConUiPanel_Shop>(FindObjectsInactive.Include);
         ShopItemLocation.PatchLoadedLevel(shop, player.Level.Current, region.shopItemLocations);
 
-        List<CConEntityDropBehaviour_TouchToCollect> dropBehaviours = [.. UnityEngine.Object.FindObjectsByType<CConEntityDropBehaviour_TouchToCollect>(DropBehaviourLocation.FindInactive, FindObjectsSortMode.None)];
+        List<CConEntityDropBehaviour_TouchToCollect> dropBehaviours = [.. Plugin.FindObjectsByType<CConEntityDropBehaviour_TouchToCollect>(DropBehaviourLocation.FindInactive, FindObjectsSortMode.None)];
         DropBehaviourLocation.PatchLoadedLevel(dropBehaviours, region.dropBehaviourLocations);
 
-        List<ConFoundryPaintPipe_Valve> valves = [.. UnityEngine.Object.FindObjectsByType<ConFoundryPaintPipe_Valve>(FoundryPipeLocation.FindInactive, FindObjectsSortMode.None)];
+        List<ConFoundryPaintPipe_Valve> valves = [.. Plugin.FindObjectsByType<ConFoundryPaintPipe_Valve>(FoundryPipeLocation.FindInactive, FindObjectsSortMode.None)];
         FoundryPipeLocation.PatchLoadedLevel(valves, region.foundryPipeLocations);
+
+        List<CConCarnivalHeadlightEye> eyes = [.. Plugin.FindObjectsByType<CConCarnivalHeadlightEye>(CarnivalEyeLocation.FindInactive, FindObjectsSortMode.None)];
+        CarnivalEyeLocation.PatchLoadedLevel(eyes, region.carnivalEyeLocations);
 
         CConBehaviour_LostShopKeeper cousin = Plugin.FindFirstObjectByType<CConBehaviour_LostShopKeeper>(CousinLocation.FindInactive);
         CousinLocation.PatchLoadedLevel(cousin, region.cousinLocation);

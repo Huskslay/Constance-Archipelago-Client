@@ -14,7 +14,8 @@ public enum RandomizableItems
     ShopItems = 1 << 5,
     DropBehaviours = 1 << 6,
     FoundryPipe = 1 << 7,
-    Cousins = 1 << 8,
-    Tears = 1 << 9,
+    CarnivalEyes = 1 << 8,
+    Cousins = 1 << 9,
+    Tears = 1 << 10,
     All = ~0
 }

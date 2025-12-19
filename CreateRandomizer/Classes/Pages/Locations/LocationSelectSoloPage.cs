@@ -96,6 +96,13 @@ public class LocationSelectSoloPage : SoloGUIPage
             if (location != null) soloPage.Open(location, Region, () => FindObjectsByType<ConFoundryPaintPipe_Valve>(FindObjectsInactive.Include, FindObjectsSortMode.None).ToList().ConvertAll(x => (MonoBehaviour)x));
         }
 
+        if (Region.carnivalEyeLocations.Count > 0)
+        {
+            ALocation location = GUIElements.ListValue("Carnival Eyes", null, Region.carnivalEyeLocations,
+                (_, t2, _) => t2 == soloPage.Location, t => t.name, 1, setColor: NotSelectedColor);
+            if (location != null) soloPage.Open(location, Region, () => FindObjectsByType<CConCarnivalHeadlightEye>(FindObjectsInactive.Include, FindObjectsSortMode.None).ToList().ConvertAll(x => (MonoBehaviour)x));
+        }
+
         if (Region.cousinLocation != null || Region.tearLocation != null)
         {
             GUILayout.Label("Others: ");

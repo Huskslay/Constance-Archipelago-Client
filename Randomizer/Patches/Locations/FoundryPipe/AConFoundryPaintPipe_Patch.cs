@@ -16,7 +16,7 @@ public class AConFoundryPaintPipe_Patch
         if (!RandomState.Randomized) return;
         if (!RandomState.IsRandomized(RandomizableItems.FoundryPipe)) return;
 
-        if (__instance is not ConFoundryPaintPipe_Valve) return;
+        if (__instance is not ConFoundryPaintPipe_Valve valve) return;
 
         LocationComponent locationComponent = __instance.GetComponent<LocationComponent>();
         if (locationComponent == null) return;
@@ -29,5 +29,6 @@ public class AConFoundryPaintPipe_Patch
             return;
         }
         fill = element.hasObtainedSource ? 1f : (fill < 0.85f ? fill : 0f);
+        if (fill > 0.85f) valve.corruptedVfx.Stop();
     }
 }

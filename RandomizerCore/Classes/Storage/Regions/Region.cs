@@ -28,6 +28,7 @@ public class Region : ISavedDataOwner<RegionSavedData>
     public readonly List<ShopItemLocation> shopItemLocations = [];
     public readonly List<DropBehaviourLocation> dropBehaviourLocations = [];
     public readonly List<FoundryPipeLocation> foundryPipeLocations = [];
+    public readonly List<CarnivalEyeLocation> carnivalEyeLocations = [];
     public readonly CousinLocation cousinLocation = null;
     public TearLocation tearLocation = null;
 
@@ -46,6 +47,7 @@ public class Region : ISavedDataOwner<RegionSavedData>
                   List<SConCollectable_ShopItem> foundShopItems,
                   List<CConEntityDropBehaviour_TouchToCollect> foundDropBehaviours,
                   List<ConFoundryPaintPipe_Valve> foundFoundryPipes,
+                  List<CConCarnivalHeadlightEye> foundCarnivalEyes,
                   CConBehaviour_LostShopKeeper foundCousin)
     {
         name = id.StringValue.Replace("Prod_", "");
@@ -62,6 +64,7 @@ public class Region : ISavedDataOwner<RegionSavedData>
         foreach (var shopItem in foundShopItems) shopItemLocations.Add(new(shopItem, this));
         foreach (var dropBehaviour in foundDropBehaviours) dropBehaviourLocations.Add(new(dropBehaviour, this));
         foreach (var foundryPipe in foundFoundryPipes) foundryPipeLocations.Add(new(foundryPipe, this));
+        foreach (var carnivalEye in foundCarnivalEyes) carnivalEyeLocations.Add(new(carnivalEye, this));
         if (foundCousin != null) cousinLocation = new(foundCousin, this);
     }
 
@@ -105,6 +108,7 @@ public class Region : ISavedDataOwner<RegionSavedData>
         TryAdd(ref locations, shopItemLocations, includedItems, include, onlyUsed);
         TryAdd(ref locations, dropBehaviourLocations, includedItems, include, onlyUsed);
         TryAdd(ref locations, foundryPipeLocations, includedItems, include, onlyUsed);
+        TryAdd(ref locations, carnivalEyeLocations, includedItems, include, onlyUsed);
         if (cousinLocation != null) TryAdd(ref locations, [cousinLocation], includedItems, include, onlyUsed);
         if (tearLocation != null) TryAdd(ref locations, [tearLocation], includedItems, include, onlyUsed);
         return locations;

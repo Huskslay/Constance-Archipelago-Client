@@ -4,6 +4,7 @@ using RandomizerCore.Classes.Handlers;
 using RandomizerCore.Classes.Handlers.SaveDataOwners.Types;
 using RandomizerCore.Classes.Storage.Locations.Types;
 using RandomizerCore.Classes.Storage.Locations.Types.Deposits;
+using RandomizerCore.Classes.Storage.Locations.Types.Progressive.Types;
 using RandomizerCore.Classes.Storage.Regions;
 using System;
 using System.Collections;
@@ -49,7 +50,7 @@ public class Scraper : MonoBehaviour
         FindFirstObjectByType<CConTimelinePlayerController>().enabled = false;
         CConPlayerEntity player = Plugin.FindFirstObjectByType<CConPlayerEntity>();
 
-
+        // Scenes
         Plugin.Logger.LogMessage($"~~~~~~~~~~~~~\nScene Editing");
 
         foreach (string scene in SceneHandler.scenes)
@@ -63,7 +64,7 @@ public class Scraper : MonoBehaviour
 
         RegionsHandler.InitAll();
 
-
+        // Flashbacks
         Plugin.Logger.LogMessage($"~~~~~~~~~~~~~\nFlashback Editing");
 
         foreach (string scene in SceneHandler.flashbackScenes)
@@ -74,7 +75,7 @@ public class Scraper : MonoBehaviour
 
         RegionsHandler.InitAll();
 
-
+        // Saved Data
         Plugin.Logger.LogMessage($"~~~~~~~~~~~~~\nPost Editing");
         foreach (Region region in RegionsHandler.I.GetAll())
         {
@@ -93,15 +94,17 @@ public class Scraper : MonoBehaviour
     {
         Plugin.Logger.LogMessage($"~~~~~~~~~~~~~\nLoading {scene}");
 
+        // Level
         ConLevelId levelId = new(scene);
         yield return RegionsHandler.I.LoadLevel(levelId, player);
 
-
+        // Transition objects
         List<CConTeleportPoint> transitions =
             [.. FindObjectsByType<CConTeleportPoint>(FindObjectsInactive.Include, FindObjectsSortMode.None)];
         Plugin.Logger.LogMessage($"Found: {transitions.Count} Transitions");
         CConElevatorBehaviour elevator = FindFirstObjectByType<CConElevatorBehaviour>(FindObjectsInactive.Exclude);
 
+        // Location objects
         List<CConCurrencyDepositEntity> deposits =
             [.. FindObjectsByType<CConCurrencyDepositEntity>(DepositLocationFactory.FindInactive, FindObjectsSortMode.None)];
         List<CConChestEntity> chests =
@@ -116,22 +119,28 @@ public class Scraper : MonoBehaviour
             [.. FindObjectsByType<CConEntityDropBehaviour_TouchToCollect>(DropBehaviourLocation.FindInactive, FindObjectsSortMode.None)];
         List<ConFoundryPaintPipe_Valve> foundryPipes =
             [.. FindObjectsByType<ConFoundryPaintPipe_Valve>(FoundryPipeLocation.FindInactive, FindObjectsSortMode.None)];
+        List<CConCarnivalHeadlightEye> eyes =
+            [.. FindObjectsByType<CConCarnivalHeadlightEye>(CarnivalEyeLocation.FindInactive, FindObjectsSortMode.None)];
         CConBehaviour_LostShopKeeper cousin = FindFirstObjectByType<CConBehaviour_LostShopKeeper>(CousinLocation.FindInactive);
 
         string isACousin = cousin == null ? "No" : "1";
-        Plugin.Logger.LogMessage($"Found: {deposits.Count} Deposits, {chests.Count} Chests, {canvases.Count} Canvases, {inspirations.Count} Inspirations, {shopItems.Count} Shop Items, {dropBehaviours.Count} Drop Behaviours, {foundryPipes.Count} Foundry Pipes, {isACousin} Cousin");
+        Plugin.Logger.LogMessage($"Found: {deposits.Count} Deposits, {chests.Count} Chests, {canvases.Count} Canvases, " +
+            $"{inspirations.Count} Inspirations, {shopItems.Count} Shop Items, {dropBehaviours.Count} Drop Behaviours, " +
+            $"{foundryPipes.Count} Foundry Pipes, {eyes.Count} Carnival Eyes, {isACousin} Cousin");
 
-        Region region = new(levelId, transitions, elevator, deposits, chests, canvases, inspirations, shopItems, dropBehaviours, foundryPipes, cousin);
+        // region
+        Region region = new(levelId, transitions, elevator, deposits, chests, canvases, inspirations, shopItems, dropBehaviours, 
+            foundryPipes, eyes, cousin);
         RegionsHandler.I.Save(region, log: false);
 
-
+        // Level checkpoints
         CConLevel_Adventure level = FindFirstObjectByType<CConLevel_Adventure>();
         List<Tuple<ConCheckPointId, ConCheckPointId>> infos = [];
         foreach (SConLevelInfo.TransitionInfo info in level.LevelInfo.transitionsTo)
             infos.Add(new(info.id.checkPoint1, info.id.checkPoint2));
         transitionInfos[region.GetFullName()] = infos;
 
-
+        // Shrines
         CConMeditationPointEntity shrine = FindFirstObjectByType<CConMeditationPointEntity>();
         if (shrine != null) hasShrines.Add(levelId.StringValue + ":" + shrine.checkPoint.checkPointId.StringValue);
     }
@@ -140,9 +149,11 @@ public class Scraper : MonoBehaviour
     {
         Plugin.Logger.LogMessage($"~~~~~~~~~~~~~\nLoading {scene}");
 
+        // Level
         ConLevelId levelId = new(scene);
         yield return RegionsHandler.I.LoadLevel(levelId, player);
 
+        // Get exit region
         CConLevel_Flashback level = FindFirstObjectByType<CConLevel_Flashback>();
         if (!level.exitToCheckPoint.TryExtractLevelId(out ConLevelId exit))
         {
@@ -155,6 +166,7 @@ public class Scraper : MonoBehaviour
             yield break;
         }
 
+        // Add tear to exit region
         exitRegion.SetTearLocation(level.tearUnlock);
         RegionsHandler.I.Save(exitRegion, log: false);
     }

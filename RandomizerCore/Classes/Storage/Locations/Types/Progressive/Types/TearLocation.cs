@@ -24,19 +24,18 @@ public class TearLocation : ALocation, IProgressiveLocation
         "tearCarnival"
     ];
 
-    private readonly int progressiveIndex;
+    private readonly int progressiveIndex = -1;
     public int GetProgressiveIndex() => progressiveIndex;
 
     private readonly CollectableItem item;
-    public override AItem GetItem() => ProgressiveItemHandler.GetItem(this);
-
-    public ProgressiveItemType GetProgressiveType() => ProgressiveItemType.Tears;
     public AItem GetProgressiveItem() => item;
+
+    public override AItem GetItem() => ProgressiveItemHandler.GetItem(this);
+    public ProgressiveItemType GetProgressiveType() => ProgressiveItemType.Tears;
 
 
     public TearLocation(SConCollectable tear, Region region) : base(ConvertName(tear), tear.name, region)
     {
-        progressiveIndex = -1;
         for (int i = 0; i < order.Count; i++)
         {
             if (CollectableHandler.nameDict[order[i]] == tear.name)

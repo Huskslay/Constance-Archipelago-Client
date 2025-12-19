@@ -23,9 +23,9 @@ public static class ProgressiveItemHandler
             else
             {
                 instance.Init();
-                if (names.Contains(instance.GetType().ToString()))
-                    Plugin.Logger.LogError($"Progressive item instance name '{instance.GetType()}' is not unique");
-                names.Add(instance.GetType().ToString());
+                if (names.Contains(instance.type.ToString()))
+                    Plugin.Logger.LogError($"Progressive item instance type '{instance.type}' is not unique");
+                names.Add(instance.type.ToString());
             }
         }
         Plugin.Logger.LogMessage($"{Instances.Count} progressive item instances found");
@@ -33,12 +33,12 @@ public static class ProgressiveItemHandler
     }
     public static void Save(ProgressiveItemInstance instance, bool log)
     {
-        FileSaveLoader.TrySaveClassToJson(instance, FolderName, instance.GetProgressiveType().ToString(), logSuccess: log);
+        FileSaveLoader.TrySaveClassToJson(instance, FolderName, instance.type.ToString(), logSuccess: log);
     }
 
     private static bool TryGetInstance(ProgressiveItemType type, out ProgressiveItemInstance instance)
     {
-        instance = Instances.Find(x => x.GetProgressiveType() == type);
+        instance = Instances.Find(x => x.type == type);
         if (instance == null)
         {
             Plugin.Logger.LogWarning($"Progressive Item Instance for type '{type}' does not exist, creating new");

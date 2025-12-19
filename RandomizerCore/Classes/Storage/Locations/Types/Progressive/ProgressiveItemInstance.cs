@@ -14,7 +14,6 @@ public class ProgressiveItemInstance(ProgressiveItemType type)
 {
     public readonly ProgressiveItemType type = type;
     public readonly List<string> locationNames = [];
-    public ProgressiveItemType GetProgressiveType() => type;
 
     [NonSerialized] private readonly List<ALocation> locations = [];
 
@@ -48,6 +47,7 @@ public class ProgressiveItemInstance(ProgressiveItemType type)
 
     public void AddItem(IProgressiveLocation location)
     {
+        if (locationNames.Contains(location.GetFullName())) return;
         locationNames.Add(location.GetFullName());
     }
 
