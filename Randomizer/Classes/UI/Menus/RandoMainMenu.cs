@@ -14,7 +14,7 @@ public class RandoMainMenu : AConStartMenuPanel, IConSelectionLayer, ITransformP
 
     public void Init()
     {
-        CConStartMenu_Patch.CreateButton("Items", transform, Items);
+        //CConStartMenu_Patch.CreateButton("Items", transform, Items);
         CConStartMenu_Patch.CreateButton("Skips", transform, Skips);
         CConStartMenu_Patch.CreateButton("Settings", transform, Settings);
         CConStartMenu_Patch.CreateBlock(50, 50, transform);
