@@ -52,7 +52,7 @@ public static class RandomSearch
             foreach (RandomStateElement element in randoMap.Values)
             {
                 if (element.isRandomized) element.dest = null;
-                else
+                else // This shouldn't add them here as it will make stuff seem possible when not gotten the item yet
                 {
                     foundItems |= element.source.GetSavedData().givenItems;
                     foundEvents |= element.source.GetSavedData().givenEvents;
