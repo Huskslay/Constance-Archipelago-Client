@@ -1,5 +1,4 @@
 ﻿using Constance;
-using RandomizerCore.Classes.State;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -60,7 +59,16 @@ public static class CollectableHandler
 
     public static void Init()
     {
-        RandomState.onLoadRandoSave.AddListener(TrueInit);
+        RandomActionHandler.preOnLoadRandoSave.AddListener(TrueInit);
+        RandomActionHandler.onLoadRandoSave.AddListener(GiveFullMap);
+    }
+
+    private static void GiveFullMap()
+    {
+        Plugin.Logger.LogMessage("Giving full map");
+        ConDebugFlags.DebugRevealMap = true;
+
+        ConMonoBehaviour.SceneRegistry.Inventory.Collect(ConMonoBehaviour.SceneRegistry.PlayerOne, CollectableHandler.NameToCollectable("map"), 1);
     }
 
     public static void TrueInit()

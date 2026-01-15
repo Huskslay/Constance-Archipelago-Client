@@ -10,7 +10,7 @@ internal class CConUiPanel_Journal_Patch
     public static CConUiPanel_Journal journal;
 
     [HarmonyPostfix]
-    [HarmonyPatch(nameof(AConUiPanel<IConUiPanel_Journal.PageType>.OpenPanel))]
+    [HarmonyPatch(nameof(AConUiPanel<>.OpenPanel))]
     private static void OpenPage_Postfix(AConUiPanel<IConUiPanel_Journal.PageType> __instance)
     {
         if (__instance is not CConUiPanel_Journal) return;
@@ -20,7 +20,7 @@ internal class CConUiPanel_Journal_Patch
     }
 
     [HarmonyPostfix]
-    [HarmonyPatch(nameof(AConUiPanel<IConUiPanel_Journal.PageType>.ClosePanel))]
+    [HarmonyPatch(nameof(AConUiPanel<>.ClosePanel))]
     private static void ClosePanel_Postfix(AConUiPanel<IConUiPanel_Journal.PageType> __instance)
     {
         if (__instance is not CConUiPanel_Journal) return;

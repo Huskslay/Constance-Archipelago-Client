@@ -1,56 +1,42 @@
 ﻿using CheatMenu.Classes;
-using RandomizerCore.Classes.Storage.Requirements.IRequirements.Types;
+using CreateRandomizer.Classes.Pages.Generic;
+using RandomizerCore.Classes.Data.Types.Regions;
 using UnityEngine;
 
 namespace CreateRandomizer.Classes.Pages.Regions;
 
 public class RegionSoloPage : SoloGUIPage
 {
-    public override string Name => Requirement == null ? "null" : Requirement.evnt.ToString();
-
-    public EventRequirement Requirement { get; private set; }
-
-    private int selectedTransition;
+    private SavedDataOwnerSoloPage<Region, RegionSavedData> soloPage;
+    public override string Name => soloPage.Name;
 
     public override void Init(ModGUI modGUI, Transform parent, int id = 1)
     {
+        soloPage = new();
         base.Init(modGUI, parent, id);
-        windowRect.height = 600f;
-        windowRect.width = 600f;
     }
 
-    public void Open(EventRequirement requirement)
+    public void Open(Region region)
     {
-        Requirement = requirement;
+        if (soloPage.OwnerSet && region == soloPage.Owner) return;
+        soloPage.Open(region);
         Open();
     }
     public override void Open()
     {
-        if (Requirement == null) return;
-        selectedTransition = -1;
+        if (!soloPage.OwnerSet) Close();
         base.Open();
     }
 
     public override void UpdateOpen()
     {
         base.UpdateOpen();
-        if (Requirement == null) return;
-
-        GUILayout.BeginHorizontal();
-        GUILayout.Label(Requirement.evnt.ToString());
-
-        GUILayout.EndHorizontal();
-        GUILayout.Space(5);
-        Requirement.evnt = GUIElements.EnumValue("Event", Requirement.evnt, 3);
-
-        PageHelpers.DrawTransitionRequirements(ref Requirement.requirements, ref selectedTransition, this);
+        soloPage.UpdateOpen();
     }
-
-
 
     public override void Close()
     {
-        Requirement = null;
+        soloPage.Close();
         base.Close();
     }
 }

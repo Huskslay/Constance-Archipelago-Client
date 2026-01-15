@@ -13,6 +13,7 @@ public static class FileSaveLoader
     private static readonly string assembly = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Assets");
     private static readonly string ext = "cls";
     private static readonly string jsonExt = "json";
+    private static readonly string txtExt = "txt";
 
     public static List<T> LoadClasses<T>(List<string> folders, ConSaveStateId? id = null)
     {
@@ -129,7 +130,7 @@ public static class FileSaveLoader
     {
         T cls = default;
 
-        string path = GetFilePath(id, folders, fileName, jsonExt);
+        string path = GetFilePath(id, folders, fileName, jsonExt, createDir: true);
         if (path == null)
         {
             Plugin.Logger.LogError("An error occured loading class when getting directory");
@@ -156,6 +157,13 @@ public static class FileSaveLoader
             Plugin.Logger.LogWarning($"Error loading from file: {ex.Message}");
         }
         return cls;
+    }
+
+
+    public static void SaveTxt(List<string> folders, string fileName, string text, ConSaveStateId? id = null)
+    {
+        string path = GetFilePath(id, folders, fileName, txtExt);
+        File.WriteAllText(path, text);
     }
 
 

@@ -3,34 +3,29 @@ using BepInEx.Logging;
 using CheatMenu.Classes;
 using Constance;
 using CreateRandomizer.Classes;
-using CreateRandomizer.Classes.Pages.Data;
 using CreateRandomizer.Classes.Pages.Locations;
 using CreateRandomizer.Classes.Pages.Regions;
-using CreateRandomizer.Classes.Pages.Transitions;
 using HarmonyLib;
 using RandomizerCore.Classes.Handlers;
-using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace CreateRandomizer;
 
-[BepInDependency("CheatMenu", BepInDependency.DependencyFlags.HardDependency)]
 [BepInDependency("FileHandler", BepInDependency.DependencyFlags.HardDependency)]
-[BepInDependency("RandomizerCore", BepInDependency.DependencyFlags.HardDependency)]
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
 public class Plugin : BaseUnityPlugin
 {
     internal static new ManualLogSource Logger;
+    public static Plugin I;
     private ModGUI modGUI;
-    public static Transform Transform { get; private set; }
 
-    private void Awake()
+    private void Start()
     {
+        I = this;
         Logger = base.Logger;
-        Transform = transform;
-
+        
+        InitModGUI();
         SceneHandler.Init();
-        InitializeModGUI();
 
         Harmony patcher = new("HarmonyPatcher");
         patcher.PatchAll();
@@ -38,18 +33,24 @@ public class Plugin : BaseUnityPlugin
         Logger.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
     }
 
-    private void InitializeModGUI()
+    private void InitModGUI()
     {
-        modGUI = ModGUI.Create(KeyCode.F1);
-        modGUI.AddPage<TransitionPage>();
-        modGUI.AddPage<LocationPage>();
-        modGUI.AddPage<RegionPage>();
-        modGUI.AddPage<DataPage>();
+        modGUI = ModGUI.Create(UnityEngine.KeyCode.None, windowName: "Create Randomizer");
+        modGUI.AddPage<RegionsPage>();
+        modGUI.AddPage<LocationsPage>();
     }
 
     private void Update()
     {
         if (Keyboard.current.f1Key.wasPressedThisFrame)
+        {
+            GameScraper.Scrape();
+        }
+        if (Keyboard.current.f2Key.wasPressedThisFrame)
+        {
+            DataConverter.Convert();
+        }
+        if (Keyboard.current.f3Key.wasPressedThisFrame)
         {
             modGUI.ShowGUI = !modGUI.ShowGUI;
         }
