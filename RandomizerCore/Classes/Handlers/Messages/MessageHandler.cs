@@ -1,4 +1,5 @@
-﻿using RandomizerCore.Classes.Archipelago;
+﻿using FileHandler.Classes;
+using RandomizerCore.Classes.Archipelago;
 using RandomizerCore.Classes.Data.Types.Items;
 using RandomizerCore.Classes.Data.Types.Locations;
 using RandomizerCore.Classes.Enums;
@@ -6,20 +7,20 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-namespace RandomizerCore.Classes.Handlers.RecentItems;
+namespace RandomizerCore.Classes.Handlers.Messages;
 
-public static class RecentItemHandler
+public static class MessageHandler
 {
     private static Canvas canvas;
-    private static TextMeshProUGUI locationTextPrefab;
+    private static TextMeshProUGUI messageTextPrefab;
 
-    private static List<TrackerText> locationTexts;
+    private static List<MessageText> messageObjects;
 
     private static TextMeshProUGUI CreateText(float x, float y,
         HorizontalAlignmentOptions horizontal = HorizontalAlignmentOptions.Left,
         VerticalAlignmentOptions vertical = VerticalAlignmentOptions.Top)
     {
-        TextMeshProUGUI textMeshProUGUI = new GameObject("Tracker Text").AddComponent<TextMeshProUGUI>();
+        TextMeshProUGUI textMeshProUGUI = new GameObject("Message Text").AddComponent<TextMeshProUGUI>();
         textMeshProUGUI.transform.SetParent(canvas.transform);
         textMeshProUGUI.text = "";
 
@@ -40,7 +41,7 @@ public static class RecentItemHandler
     {
         RandomActionHandler.onLocationGet.AddListener(OnLocationGet);
         RandomActionHandler.onItemGet.AddListener(OnItemGet);
-        locationTexts = [];
+        messageObjects = [];
 
         canvas = new GameObject().AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -48,8 +49,19 @@ public static class RecentItemHandler
         canvas.sortingOrder = 100;
         canvas.transform.SetParent(Plugin.I.transform);
 
-        locationTextPrefab = CreateText(30, 0);
-        locationTextPrefab.gameObject.SetActive(false);
+        messageTextPrefab = CreateText(30, 0);
+        messageTextPrefab.gameObject.SetActive(false);
+
+        GameDataActions.OnFileQuit.AddListener(OnFileQuit);
+    }
+    private static void OnFileQuit()
+    {
+        Plugin.Logger.LogMessage("Destroying all message text objects");
+        while (messageObjects.Count > 0)
+        {
+            Plugin.Destroy(messageObjects[0].GameObject);
+            messageObjects.RemoveAt(0);
+        }
     }
 
     private static void OnLocationGet(ALocation location)
@@ -71,21 +83,23 @@ public static class RecentItemHandler
 
     public static void CreateText(string displayText, bool permanent = false, Color? color = null)
     {
-        TextMeshProUGUI tmp = Plugin.Instantiate(locationTextPrefab, canvas.transform);
-        tmp.transform.position = locationTextPrefab.transform.position;
-        TrackerText trackerText = new(tmp, permanent);
+        Plugin.Logger.LogMessage($"Creating {(permanent ? "permanent" : "")} text '{displayText}'");
 
-        trackerText.Begin(displayText, color == null ? Color.white : (Color)color);
-        foreach (TrackerText text in locationTexts) text.Bump();
-        locationTexts.Add(trackerText);
+        TextMeshProUGUI tmp = Plugin.Instantiate(messageTextPrefab, canvas.transform);
+        tmp.transform.position = messageTextPrefab.transform.position;
+        MessageText messageText = new(tmp, permanent);
+
+        messageText.Begin(displayText, color == null ? Color.white : (Color)color);
+        foreach (MessageText text in messageObjects) text.Bump();
+        messageObjects.Add(messageText);
     }
 
     public static void Update()
     {
         int index = 0;
-        while (index < locationTexts.Count)
+        while (index < messageObjects.Count)
         {
-            if (locationTexts[index].Update()) locationTexts.RemoveAt(index);
+            if (messageObjects[index].Update()) messageObjects.RemoveAt(index);
             else index++;
         }
     }

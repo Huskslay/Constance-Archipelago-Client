@@ -1,9 +1,9 @@
 ﻿using TMPro;
 using UnityEngine;
 
-namespace RandomizerCore.Classes.Handlers.RecentItems;
+namespace RandomizerCore.Classes.Handlers.Messages;
 
-public class TrackerText(TextMeshProUGUI text, bool permanent)
+public class MessageText(TextMeshProUGUI text, bool permanent)
 {
     private readonly TextMeshProUGUI text = text;
     private readonly bool permanent = permanent;
@@ -12,6 +12,8 @@ public class TrackerText(TextMeshProUGUI text, bool permanent)
 
     private float timeUntilFade = 15f;
     private readonly float bumpHeight = 40f;
+
+    public GameObject GameObject => text.gameObject;
 
     public void Begin(string displayText, Color color)
     {

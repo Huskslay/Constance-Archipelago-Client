@@ -6,7 +6,7 @@ using RandomizerCore.Classes.Data;
 using RandomizerCore.Classes.Data.Saved;
 using RandomizerCore.Classes.Handlers;
 using RandomizerCore.Classes.Handlers.Files;
-using RandomizerCore.Classes.Handlers.RecentItems;
+using RandomizerCore.Classes.Handlers.Messages;
 using RandomizerCore.Classes.Handlers.State;
 
 namespace RandomizerCore;
@@ -27,7 +27,7 @@ public class Plugin : BaseUnityPlugin
         RandomFilesHandler.Init();
         RandomStateHandler.Init();
         SavedDataOwnerHandler<ISavedDataOwner<SavedData>, SavedData>.InitAll();
-        RecentItemHandler.Init();
+        MessageHandler.Init();
 
         Harmony patcher = new("HarmonyPatcher");
         patcher.PatchAll();
@@ -37,7 +37,7 @@ public class Plugin : BaseUnityPlugin
 
     private void Update()
     {
-        RecentItemHandler.Update();
+        MessageHandler.Update();
         MultiClient.Update();
     }
 

@@ -4,7 +4,7 @@ using Archipelago.MultiClient.Net.Models;
 using RandomizerCore.Classes.Data.Types.Locations;
 using RandomizerCore.Classes.Handlers;
 using RandomizerCore.Classes.Handlers.Files;
-using RandomizerCore.Classes.Handlers.RecentItems;
+using RandomizerCore.Classes.Handlers.Messages;
 using RandomizerCore.Classes.Handlers.State;
 using System;
 using System.Collections.Generic;
@@ -147,7 +147,7 @@ public static class MultiClient
         {
             if (playedDisconnectMessage != null)
             {
-                RecentItemHandler.CreateText(playedDisconnectMessage, permanent: true, UnityEngine.Color.red);
+                MessageHandler.CreateText(playedDisconnectMessage, permanent: true, UnityEngine.Color.red);
                 playedDisconnectMessage = null;
             }
             return;
