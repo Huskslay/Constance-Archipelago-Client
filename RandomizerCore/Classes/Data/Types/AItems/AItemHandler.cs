@@ -1,7 +1,4 @@
-﻿using FileHandler.Classes;
-using System;
-
-namespace RandomizerCore.Classes.Data.Types.AItems;
+﻿namespace RandomizerCore.Classes.Data.Types.AItems;
 
 public class AItemHandler : SavedDataOwnerHandler<AItem, AItemSavedData>
 {
@@ -12,11 +9,5 @@ public class AItemHandler : SavedDataOwnerHandler<AItem, AItemSavedData>
     {
         I = this;
         base.Init();
-    }
-
-    protected override void LoadAll(Action<AItem> initiate)
-    {
-        foreach (AItem item in FileSaveLoader.LoadClasses<AItem>(FolderPath))
-            initiate(item);
     }
 }

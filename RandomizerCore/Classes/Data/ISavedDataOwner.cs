@@ -5,7 +5,6 @@ namespace RandomizerCore.Classes.Data;
 public interface ISavedDataOwner<T> where T : SavedData
 {
     public string GetName();
-
     public void Init();
 
     T GetSavedData();

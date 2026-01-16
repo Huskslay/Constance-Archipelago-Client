@@ -1,10 +1,4 @@
-﻿using FileHandler.Classes;
-using RandomizerCore.Classes.Enums;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace RandomizerCore.Classes.Data.Types.GameEventElements;
+﻿namespace RandomizerCore.Classes.Data.Types.GameEventElements;
 
 public class GameEventHandler : SavedDataOwnerHandler<GameEvent, GameEventSavedData>
 {
@@ -15,11 +9,5 @@ public class GameEventHandler : SavedDataOwnerHandler<GameEvent, GameEventSavedD
     {
         I = this;
         base.Init();
-    }
-
-    protected override void LoadAll(Action<GameEvent> initiate)
-    {
-        foreach (GameEvent item in FileSaveLoader.LoadClasses<GameEvent>(FolderPath))
-            initiate(item);
     }
 }

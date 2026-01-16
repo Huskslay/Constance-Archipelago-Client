@@ -1,7 +1,4 @@
-﻿using FileHandler.Classes;
-using System;
-
-namespace RandomizerCore.Classes.Data.Types.Locations;
+﻿namespace RandomizerCore.Classes.Data.Types.Locations;
 
 public class LocationHandler : SavedDataOwnerHandler<ALocation, ALocationSavedData>
 {
@@ -12,11 +9,5 @@ public class LocationHandler : SavedDataOwnerHandler<ALocation, ALocationSavedDa
     {
         I = this;
         base.Init();
-    }
-
-    protected override void LoadAll(Action<ALocation> initiate)
-    {
-        foreach (ALocation item in FileSaveLoader.LoadClasses<ALocation>(FolderPath))
-            initiate(item);
     }
 }

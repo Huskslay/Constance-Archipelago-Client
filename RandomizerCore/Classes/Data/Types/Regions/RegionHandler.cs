@@ -1,7 +1,5 @@
 ﻿using Constance;
-using FileHandler.Classes;
 using Leo;
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -16,12 +14,6 @@ public class RegionHandler : SavedDataOwnerHandler<Region, RegionSavedData>
     {
         I = this;
         base.Init();
-    }
-
-    protected override void LoadAll(Action<Region> initiate)
-    {
-        foreach (Region item in FileSaveLoader.LoadClasses<Region>(FolderPath))
-            initiate(item);
     }
 
 

@@ -1,7 +1,5 @@
 ﻿using RandomizerCore.Classes.Enums;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace RandomizerCore.Classes.Data.Types.GameEventElements;
 
