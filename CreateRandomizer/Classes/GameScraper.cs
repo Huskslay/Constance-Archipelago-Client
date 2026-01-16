@@ -13,6 +13,7 @@ using RandomizerCore.Classes.Enums;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml.Linq;
 using UnityEngine;
 
 namespace CreateRandomizer.Classes;
@@ -90,9 +91,8 @@ public static class GameScraper
         }
 
         // Add tear to exit region
-        exitRegion.locations.Add(
-            new TearLocation(level.tearUnlock, exitRegion).GetName()
-        );
+        TearLocation tearLocation = new(level.tearUnlock, exitRegion);
+        exitRegion.locations.Add(tearLocation.GetName());
         RegionHandler.I.Save(exitRegion);
     }
 
@@ -160,6 +160,7 @@ public static class GameScraper
         foreach (CConTeleportPoint tp_point in
             Plugin.FindObjectsByType<CConTeleportPoint>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
+            bool completed = false;
             foreach (SConLevelInfo.TransitionInfo info in level.LevelInfo.transitionsTo)
             {
                 string region1 = info.id.Level1.StringValue.Replace("Prod_", "");
@@ -167,13 +168,26 @@ public static class GameScraper
 
                 if (region1 == region.name || region2 == region.name)
                 {
-                    string goal = region1 == region.name ? region2 : region1;
-                    string chpt = region1 == region.name ? info.id.checkPoint1.StringValue : info.id.checkPoint2.StringValue;
+                    completed = true;
 
-                    string hash = FileSaveLoader.FourDigitHash(chpt);
-                    TeleportEntrance entrance = new(hash, elevator: false, region, goal);
+                    string connectionRegion = region1 == region.name ? region2 : region1;
+                    string chpt = region1 == region.name ? info.id.checkPoint2.StringValue : info.id.checkPoint1.StringValue;
+                    string connectionChpt = region1 == region.name ? info.id.checkPoint1.StringValue : info.id.checkPoint2.StringValue;
+
+                    string name = FileSaveLoader.FourDigitHash(chpt);
+                    string connectionName = FileSaveLoader.FourDigitHash(connectionChpt);
+                    TeleportEntrance entrance = new(name, region, connectionName, connectionRegion, tp_point.teleportTo);
                     entrances.Add(entrance.GetName());
+
+                    break;
                 }
+            }
+            if (!completed)
+            {
+                Plugin.Logger.LogWarning($"Could not find connection for transtion: {tp_point.name}");
+                string name = FileSaveLoader.FourDigitHash(tp_point.teleportTo.StringValue);
+                TeleportEntrance entrance = new(name, region, null, null, tp_point.teleportTo);
+                entrances.Add(entrance.GetName());
             }
         }
 

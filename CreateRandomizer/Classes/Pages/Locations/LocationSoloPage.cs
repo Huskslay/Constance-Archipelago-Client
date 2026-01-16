@@ -1,36 +1,38 @@
 ﻿using CheatMenu.Classes;
 using CreateRandomizer.Classes.Pages.Generic;
-using RandomizerCore.Classes.Data.Types.Regions;
+using RandomizerCore.Classes.Data.Types.Locations;
 using UnityEngine;
 
-namespace CreateRandomizer.Classes.Pages.Regions;
+namespace CreateRandomizer.Classes.Pages.Locations;
 
-public class RegionSoloPage : SoloGUIPage
+public class LocationSoloPage : SoloGUIPage
 {
-    private SavedDataOwnerSoloPage<Region, RegionSavedData> soloPage;
+    private SavedDataOwnerSoloPage<ALocation, ALocationSavedData> soloPage;
     public override string Name => soloPage.Name;
+    private string selectedEntranceRule;
 
     public override void Init(ModGUI modGUI, Transform parent, int id = 1)
     {
         soloPage = new();
         base.Init(modGUI, parent, id);
+        selectedEntranceRule = null;
     }
 
-    public void Open(Region region)
+    public void Open(ALocation location)
     {
-        if (soloPage.OwnerSet && region == soloPage.Owner) return;
-        soloPage.Open(region, DrawSavedData);
+        if (soloPage.OwnerSet && soloPage.Owner == location) return;
+        soloPage.Open(location, DrawSavedData);
         Open();
     }
     public override void Open()
     {
         if (!soloPage.OwnerSet) Close();
-        base.Open();
+        else base.Open();
     }
 
-    private void DrawSavedData(RegionSavedData savedData)
+    private void DrawSavedData(ALocationSavedData savedData)
     {
-
+        PageHelpers.DrawEntranceRuleSavedData(savedData, ref selectedEntranceRule);
     }
 
     public override void UpdateOpen()

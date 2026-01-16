@@ -39,6 +39,7 @@ public abstract class SavedDataOwnerHandler<T1, T2> where T1 : ISavedDataOwner<T
         Plugin.Logger.LogMessage($"Loading {GetName()}");
         LoadAll();
         LoadAllSavedDatas();
+        foreach (T1 dataOwner in dataOwners.Values) OnEachLoaded(dataOwner);
     }
 
     private void LoadAll()
@@ -98,6 +99,11 @@ public abstract class SavedDataOwnerHandler<T1, T2> where T1 : ISavedDataOwner<T
         }
     }
 
+
+    public virtual void OnEachLoaded(T1 loaded)
+    {
+
+    }
 
 
 

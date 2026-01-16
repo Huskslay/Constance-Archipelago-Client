@@ -1,5 +1,9 @@
-﻿using RandomizerCore.Classes.Data;
+﻿using CheatMenu.Classes;
+using RandomizerCore.Classes.Data;
+using RandomizerCore.Classes.Data.EntranceRules;
 using RandomizerCore.Classes.Data.Saved;
+using System;
+using UnityEngine;
 
 namespace CreateRandomizer.Classes.Pages.Generic;
 
@@ -8,18 +12,20 @@ public class SavedDataOwnerSoloPage<T1, T2> where T1 : ISavedDataOwner<T2> where
     public T1 Owner { get; private set; }
     public bool OwnerSet { get; private set; } = false;
 
+    private Action<T2> drawSavedData;
+
     public string Name => OwnerSet ? Owner.GetName() : "null";
 
-    public void Open(T1 owner)
+    public void Open(T1 owner, Action<T2> drawSavedData)
     {
         Owner = owner;
         OwnerSet = true;
+        this.drawSavedData = drawSavedData;
     }
 
     public void UpdateOpen()
     {
-        if (!OwnerSet) return;
-        SavedDataDrawer.Draw(Owner.GetSavedData());
+        if (OwnerSet) drawSavedData?.Invoke(Owner.GetSavedData());
     }
 
     public void Close()

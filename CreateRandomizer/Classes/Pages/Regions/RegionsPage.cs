@@ -7,7 +7,7 @@ namespace CreateRandomizer.Classes.Pages.Regions;
 
 public class RegionsPage : GUIPage
 {
-    private SavedDataOwnersPage<Region, RegionSavedData> page;
+    private SavedDataOwnersSelectPage<Region, RegionSavedData> page;
     private RegionSoloPage soloPage;
 
     public override string Name => "Regions";
@@ -15,14 +15,14 @@ public class RegionsPage : GUIPage
     public override void Init(ModGUI modGUI, Transform parent, int id = 1)
     {
         base.Init(modGUI, parent, id);
-        page = new(RegionHandler.I, 3);
+        page = new(3);
         soloPage = new GameObject("Solo").AddComponent<RegionSoloPage>();
         soloPage.Init(modGUI, transform, ModGUI.winId++);
     }
 
     public override void Open()
     {
-        page.Open();
+        page.Open(Name, [.. RegionHandler.I.dataOwners.Values], (x) => null);
     }
 
     public override void UpdateOpen()
@@ -33,6 +33,7 @@ public class RegionsPage : GUIPage
 
     public override void Close()
     {
+        soloPage.Close();
         page.Close();
     }
 }

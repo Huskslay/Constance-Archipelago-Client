@@ -44,8 +44,8 @@ public static class DataConverter
         {
             output += $"{entrance.GetName().Replace("-", "_")} = (" +
                 $"\"{entrance.GetName()}\", " +
-                $"\"{entrance.parent}\", " +
-                $"\"{entrance.connection}\", " +
+                $"\"{entrance.region}\", " +
+                $"\"{entrance.connectionRegion}\", " +
             $")\n";
         }
         List<ElevatorEntrance> elevators = entrances.FindAll(x => x.GetType() == typeof(ElevatorEntrance))

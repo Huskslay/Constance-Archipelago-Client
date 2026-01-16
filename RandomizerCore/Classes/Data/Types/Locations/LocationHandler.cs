@@ -1,4 +1,6 @@
-﻿namespace RandomizerCore.Classes.Data.Types.Locations;
+﻿using RandomizerCore.Classes.Data.Types.Entrances.Types;
+
+namespace RandomizerCore.Classes.Data.Types.Locations;
 
 public class LocationHandler : SavedDataOwnerHandler<ALocation, ALocationSavedData>
 {

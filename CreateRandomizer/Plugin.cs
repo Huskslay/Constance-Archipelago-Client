@@ -3,6 +3,7 @@ using BepInEx.Logging;
 using CheatMenu.Classes;
 using Constance;
 using CreateRandomizer.Classes;
+using CreateRandomizer.Classes.Pages.Entrances;
 using CreateRandomizer.Classes.Pages.Locations;
 using CreateRandomizer.Classes.Pages.Regions;
 using HarmonyLib;
@@ -23,7 +24,7 @@ public class Plugin : BaseUnityPlugin
     {
         I = this;
         Logger = base.Logger;
-        
+
         InitModGUI();
         SceneHandler.Init();
 
@@ -37,7 +38,8 @@ public class Plugin : BaseUnityPlugin
     {
         modGUI = ModGUI.Create(UnityEngine.KeyCode.None, windowName: "Create Randomizer");
         modGUI.AddPage<RegionsPage>();
-        modGUI.AddPage<LocationsPage>();
+        modGUI.AddPage<LocationsRegionPage>();
+        modGUI.AddPage<EntrancesRegionPage>();
     }
 
     private void Update()

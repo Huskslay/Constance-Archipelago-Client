@@ -12,6 +12,4 @@ public class EntranceRuleSavedData(string connection) : SavedData(connection)
     public bool used = false;
 
     public List<EntranceRule> entranceRules = [];
-
-    public override Color? GetColor() => completed ? null : Color.red;
 }
