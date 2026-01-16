@@ -10,10 +10,12 @@ public static class ShrineDataHandler
     private static readonly string file = "Shrine Warp";
 
     public static List<ShrineData> loadedData = null;
+    private static List<string> regions;
 
 
     public static void Init()
     {
+        regions = FileSaveLoader.LoadClassFromJson<List<string>>(["Output"], "shrines");
         GameDataActions.OnFileSave.AddListener(SaveShrineData);
         GameDataActions.OnFileDelete.AddListener(DeleteShrineData);
     }
@@ -48,7 +50,7 @@ public static class ShrineDataHandler
     {
         Plugin.Logger.LogWarning("No shrine warp data found, creating new");
         loadedData = [];
-        foreach (string region in Plugin.regions)
+        foreach (string region in regions)
         {
             string[] split = region.Split(':');
             loadedData.Add(new(split[0], split[1], false));

@@ -19,6 +19,8 @@ namespace CreateRandomizer.Classes;
 
 public static class GameScraper
 {
+    private static List<string> hasShrines;
+
     public static void Scrape()
     {
         Plugin.I.StartCoroutine(ScrapeLevels());
@@ -26,12 +28,16 @@ public static class GameScraper
 
     private static IEnumerator ScrapeLevels()
     {
-        Plugin.FindFirstObjectByType<CConTimelinePlayerController>().enabled = false;
+        Plugin.FindFirstObjectByType<CConTimelinePlayerController>().enabled = false; // Throws errors
         CConPlayerEntity player = Plugin.FindFirstObjectByType<CConPlayerEntity>();
 
+        // Scenes
+        hasShrines = ["Prod_V01:cp_Prod_V01_a15fffec-931b-4c37-8dac-6f4c1e742549"];
         foreach (string scene in SceneHandler.scenes)
             yield return ScrapeLevel(scene, player);
+        FileSaveLoader.TrySaveClassToJson(hasShrines, ["Output"], "shrines");
 
+        // Flashbacks
         foreach (string scene in SceneHandler.flashbackScenes)
             yield return ScrapeFlashback(scene, player);
     }
@@ -45,6 +51,10 @@ public static class GameScraper
         ConLevelId levelId = new(scene);
         yield return RegionHandler.LoadRegion(levelId, player: player);
         Region region = new(scene);
+
+        // Shrines
+        CConMeditationPointEntity shrine = Plugin.FindFirstObjectByType<CConMeditationPointEntity>();
+        if (shrine != null) hasShrines.Add(scene + ":" + shrine.checkPoint.checkPointId.StringValue);
 
         // Set
         region.entrances = GetEntrances(region);

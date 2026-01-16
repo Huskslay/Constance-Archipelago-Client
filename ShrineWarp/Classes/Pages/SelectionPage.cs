@@ -44,7 +44,9 @@ public class SelectionPage : GUIPage
     {
         CConPlayerEntity player = Plugin.FindFirstObjectByType<CConPlayerEntity>();
         ConStateAbility_Player_Transition transitionAbility = player.SM.TransitionAbility;
+        CConCheckPointManager checkPointManager = CConSceneRegistry.Instance.CheckPointManager as CConCheckPointManager;
         CConTransitionManager transitionManager = transitionAbility.TransitionManager;
+        if (levelId.StringValue != "Prod_V01") id = checkPointManager.GetFallbackCheckpointId(levelId);
 
         ConTransitionCommand_Default trans = new(
             id,
@@ -56,8 +58,17 @@ public class SelectionPage : GUIPage
 
         transitionAbility.StartTransitionIn(trans);
         float start = Time.time;
-        yield return new WaitUntil(() => !transitionManager.IsRunning || Time.time - start > 10);
-        if (transitionManager.IsRunning) transitionManager.AbortTransition();
+        yield return new WaitUntil(() => !transitionManager.IsRunning || Time.time - start > 15);
+        if (transitionManager.IsRunning)
+        {
+            Plugin.Logger.LogError($"Transition did not end fast enough, forcably ending");
+            transitionManager.AbortTransition();
+        }
+        if (levelId.StringValue != "Prod_V01")
+        {
+            CConMeditationPointEntity shrine = Plugin.FindFirstObjectByType<CConMeditationPointEntity>(FindObjectsInactive.Include);
+            if (shrine != null) player.transform.position = shrine.transform.position;
+        }
     }
 
 

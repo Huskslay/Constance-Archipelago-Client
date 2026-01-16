@@ -34,7 +34,7 @@ public class RegionHandler : SavedDataOwnerHandler<Region, RegionSavedData>
     }
     public static IEnumerator LoadRegion(ConLevelId levelId, CConPlayerEntity player = null, ConCheckPointId? id = null, Direction direction = null)
     {
-        player = Plugin.FindFirstObjectByType<CConPlayerEntity>();
+        player ??= Plugin.FindFirstObjectByType<CConPlayerEntity>();
         ConStateAbility_Player_Transition transitionAbility = player.SM.TransitionAbility;
         CConCheckPointManager checkPointManager = CConSceneRegistry.Instance.CheckPointManager as CConCheckPointManager;
         CConTransitionManager transitionManager = transitionAbility.TransitionManager;
