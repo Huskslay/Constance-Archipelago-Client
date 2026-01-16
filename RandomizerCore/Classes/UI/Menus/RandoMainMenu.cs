@@ -10,9 +10,12 @@ namespace RandomizerCore.Classes.UI.Menus;
 
 public class RandoMainMenu : AConStartMenuPanel, IConSelectionLayer, ITransformProvider
 {
-    public override IConSelectionLayer SelectionLayer => this;
+    public bool isNewRando;
 
+
+    public override IConSelectionLayer SelectionLayer => this;
     public override bool AllowCancel => true;
+
 
     private RandoInputField urlInput;
     private RandoInputField portInput;
@@ -25,14 +28,17 @@ public class RandoMainMenu : AConStartMenuPanel, IConSelectionLayer, ITransformP
 
     private RandoButton errorButton;
 
-    public bool newRando;
 
     public void Init()
     {
-        urlInput = new(transform, "Url: ", url, false, OnUpdateUrl, DisableAll);
-        portInput = new(transform, "Port: ", port.ToString(), true, OnUpdatePort, DisableAll);
-        slotInput = new(transform, "Slot: ", slot, false, OnUpdateSlot, DisableAll);
-        pwInput = new(transform, "Password: ", password, false, OnUpdatePassword, DisableAll);
+        urlInput = new(transform, "Url: ", url, false, 
+            (button, newValue) => OnUpdateText(ref url, button, newValue), DisableAll);
+        portInput = new(transform, "Port: ", port.ToString(), true, 
+            (button, newValue) => OnUpdateInt(ref port, button, newValue), DisableAll);
+        slotInput = new(transform, "Slot: ", slot, false, 
+            (button, newValue) => OnUpdateText(ref slot, button, newValue), DisableAll);
+        pwInput = new(transform, "Password: ", password, false, 
+            (button, newValue) => OnUpdateText(ref password, button, newValue), DisableAll);
 
         CConStartMenu_Patch.CreateBlock(50, 60, transform);
         errorButton = CConStartMenu_Patch.CreateButton("", transform, null);
@@ -55,29 +61,19 @@ public class RandoMainMenu : AConStartMenuPanel, IConSelectionLayer, ITransformP
 
     public void UpdateValues(RandomFile file)
     {
-        OnUpdateUrl(urlInput, file.url);
-        OnUpdatePort(portInput, file.port.ToString());
-        OnUpdateSlot(slotInput, file.slotName.ToString());
-        OnUpdatePassword(pwInput, "");
+        OnUpdateText(ref url, urlInput, file.url);
+        OnUpdateInt(ref port, portInput, file.port.ToString());
+        OnUpdateText(ref slot, slotInput, file.slotName.ToString());
+        OnUpdateText(ref password, pwInput, "");
     }
-    private void OnUpdateUrl(RandoInputField inputButton, string newValue)
+    private void OnUpdateText(ref string value, RandoInputField inputButton, string newValue)
     {
-        url = newValue;
+        value = newValue;
         inputButton.SetInput(newValue);
     }
-    private void OnUpdatePort(RandoInputField inputButton, string newValue)
+    private void OnUpdateInt(ref int value, RandoInputField inputButton, string newValue)
     {
-        if (!int.TryParse(newValue, out port)) return;
-        inputButton.SetInput(newValue);
-    }
-    private void OnUpdateSlot(RandoInputField inputButton, string newValue)
-    {
-        slot = newValue;
-        inputButton.SetInput(newValue);
-    }
-    private void OnUpdatePassword(RandoInputField inputButton, string newValue)
-    {
-        password = newValue;
+        if (!int.TryParse(newValue, out value)) return;
         inputButton.SetInput(newValue);
     }
 
@@ -92,19 +88,18 @@ public class RandoMainMenu : AConStartMenuPanel, IConSelectionLayer, ITransformP
         DisableAll();
         RandomFilesHandler.Connect(url, port, slot, password, (errorMessage) => errorButton.text = errorMessage);
     }
-
     private void Back(RandoButton button)
     {
         DisableAll();
-        CConStartMenu_Patch.SwitchMenu(newRando ? RandomMenuHandler.RandoSelectMenu : CConStartMenu_Patch.SaveMenu, this);
+        CConStartMenu_Patch.SwitchMenu(isNewRando ? RandomMenuHandler.RandoSelectMenu : CConStartMenu_Patch.SaveMenu, this);
     }
 
 
 
     public override bool OpenPanel(IConPlayerEntity player, Leo.Void parameters)
     {
-        gameObject.SetActive(true);
         errorButton.text = "";
+        gameObject.SetActive(true);
         return base.OpenPanel(player, parameters);
     }
     public override bool ClosePanel()

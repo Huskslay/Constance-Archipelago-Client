@@ -9,7 +9,6 @@ namespace RandomizerCore.Classes.UI.Menus;
 public class RandoSelectMenu : AConStartMenuPanel, IConSelectionLayer, ITransformProvider
 {
     public override IConSelectionLayer SelectionLayer => this;
-
     public override bool AllowCancel => true;
 
 
@@ -23,15 +22,10 @@ public class RandoSelectMenu : AConStartMenuPanel, IConSelectionLayer, ITransfor
 
 
 
-    public bool TryGetNewSelection(out ISelectHandler selectable)
-    {
-        return ConUiUtils.FindFirstSelectable(gameObject, out selectable);
-    }
-
     private void Randomizer(RandoButton button)
     {
         RandomMenuHandler.randomizing = true;
-        RandomMenuHandler.RandoMainMenu.newRando = true;
+        RandomMenuHandler.RandoMainMenu.isNewRando = true;
         CConStartMenu_Patch.SwitchMenu(RandomMenuHandler.RandoMainMenu, this);
     }
     private void Vanilla(RandoButton button)
@@ -44,6 +38,13 @@ public class RandoSelectMenu : AConStartMenuPanel, IConSelectionLayer, ITransfor
         CConStartMenu_Patch.SwitchMenu(CConStartMenu_Patch.SaveMenu, this);
     }
 
+
+
+    // For sake of interface requirements
+    public bool TryGetNewSelection(out ISelectHandler selectable)
+    {
+        return ConUiUtils.FindFirstSelectable(gameObject, out selectable);
+    }
 
 
     public override bool OpenPanel(IConPlayerEntity player, Leo.Void parameters)

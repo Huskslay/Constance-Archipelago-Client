@@ -27,7 +27,7 @@ public class CConUiSaveSlot_Patch
             if (!RandomMenuHandler.randomizing) return true;
 
             // Is a rando, prepare
-            RandomMenuHandler.RandoMainMenu.newRando = false;
+            RandomMenuHandler.RandoMainMenu.isNewRando = false;
             RandomMenuHandler.RandoMainMenu.UpdateValues(file);
             // Open rando settings menu
             CConStartMenu_Patch.SwitchMenu(RandomMenuHandler.RandoMainMenu, CConStartMenu_Patch.SaveMenu);

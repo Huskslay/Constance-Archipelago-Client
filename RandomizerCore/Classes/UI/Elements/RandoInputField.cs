@@ -35,13 +35,15 @@ public class RandoInputField
         this.onUpdate?.Invoke(this, input);
     }
 
-    public void OnClick(RandoButton _) { onClick?.Invoke(); active = true; }
+    public void OnClick(RandoButton _) 
+    { 
+        onClick?.Invoke();
+        active = true; 
+    }
 
-    public void SetInput(string newInput)
+    public void SetInput(string newInput, bool force = false)
     {
-        if (newInput.Length >= maxLength) return;
-
-        input = newInput;
+        if (!force && newInput.Length < maxLength) input = newInput;
     }
 
     private void OnUpdate()
@@ -52,6 +54,7 @@ public class RandoInputField
             return;
         }
 
+        // Handle showing activeness
         if (Time.time > nextTime)
         {
             nextTime = Time.time + blinkTime;
@@ -59,11 +62,16 @@ public class RandoInputField
         }
         button.text = text + input.ToString() + (showing ? "<color=#FFFFFFFF>" : "<color=#FFFFFF00>") + "|</color>";
 
+        // Bakcspace
         if (Keyboard.current.backspaceKey.wasPressedThisFrame && input.Length > 0)
         { input = input[..^1]; onUpdate?.Invoke(this, input); }
 
+        // Message length
         if (input.Length > maxLength) input = input[..maxLength];
         if (input.Length >= maxLength) return;
+
+        // Typing
+        // There's definitely a better way to do this
 
         if (Keyboard.current.digit0Key.wasPressedThisFrame || Keyboard.current.numpad0Key.wasPressedThisFrame)
         { input += "0"; onUpdate?.Invoke(this, input); }
