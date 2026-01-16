@@ -128,7 +128,6 @@ public static class MultiClient
         RandomStateHandler.DisconnectLocations.RemoveAt(0);
         return true;
     }
-
     // Try get an location each frame
     private static bool TryPopRecievedLocation()
     {
@@ -167,6 +166,8 @@ public static class MultiClient
         if (TryPopRecievedLocation()) return;
         if (TryPopDisconnectLocation()) return;
     }
+
+
 
     // Search for what item a location has
     public static string ScoutItemName(string locationName, out string playerName, out bool isCurrentPlayer)
