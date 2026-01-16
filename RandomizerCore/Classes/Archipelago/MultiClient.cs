@@ -16,7 +16,8 @@ public static class MultiClient
 {
     public static string GameName => "Constance";
 
-    private static bool Connected => session != null && session.Socket != null && session.Socket.Connected;
+    private static bool IsConnected => session != null && session.Socket != null && session.Socket.Connected;
+    private static bool isSubscribed = false;
 
     public static string Url { get; private set; }
     public static int Port { get; private set; }
@@ -27,24 +28,29 @@ public static class MultiClient
     private static int playerSlot;
 
 
-    private static String playedDisconnectMessage = null;
+    private static string playedDisconnectMessage = null;
     public static readonly Queue<string> recievedLocations = new();
 
 
     public static LoginResult Connect(string server, int port, string user, string password, out string errorMessage, out SlotData slotData)
     {
         Plugin.Logger.LogMessage($"Attempting to connect to '{server}:{port}' as {user}");
+        // Establish session
         session = ArchipelagoSessionFactory.CreateSession(server, port);
 
+        // Store information for later storage into save file
         Url = server;
         Port = port;
         SlotName = user;
 
+        // Subscribe
         session.Socket.SocketClosed += OnSocketClosed;
         session.Socket.ErrorReceived += ErrorRecieved;
         session.Locations.CheckedLocationsUpdated += RecievedLocaion;
         RandomActionHandler.onLocationCheck.AddListener(OnLocationChecked);
+        isSubscribed = true;
 
+        // Attempt to login
         LoginResult result;
         try
         {
@@ -57,6 +63,7 @@ public static class MultiClient
             result = new LoginFailure(e.GetBaseException().Message);
         }
 
+        // Login failed, disconnect everything and send back an error
         if (!result.Successful)
         {
             Disconnect();
@@ -68,14 +75,14 @@ public static class MultiClient
             Plugin.Logger.LogError(errorMessage);
             return result;
         }
-
+        
+        // Login succeeded, intialize the rest and return success
         LoginSuccessful success = (LoginSuccessful)result;
         playerSlot = success.Slot;
         Plugin.Logger.LogMessage($"Successfully connected to '{server}:{port}' as {user} and slot {playerSlot}");
 
         errorMessage = null;
         slotData = new(session.DataStorage.GetSlotData());
-
         DataStorage.Initialize(session);
 
         return result;
@@ -86,7 +93,7 @@ public static class MultiClient
     // Location got, tell server
     private static void OnLocationChecked(ALocation location)
     {
-        if (Connected)
+        if (IsConnected)
         {
             long id = session.Locations.GetLocationIdFromName(GameName, location.GetName());
             session.Locations.CompleteLocationChecks(id);
@@ -143,8 +150,9 @@ public static class MultiClient
     }
     public static void Update()
     {
-        if (!Connected)
+        if (!IsConnected)
         {
+            // Disconnect message must be established on main thread
             if (playedDisconnectMessage != null)
             {
                 MessageHandler.CreateText(playedDisconnectMessage, permanent: true, UnityEngine.Color.red);
@@ -154,6 +162,7 @@ public static class MultiClient
         }
         if (!RandomStateHandler.readyForItems) return;
 
+        // Recieving items / locations (one per frame)
         if (TryRecieveItem()) return;
         if (TryPopRecievedLocation()) return;
         if (TryPopDisconnectLocation()) return;
@@ -162,7 +171,7 @@ public static class MultiClient
     // Search for what item a location has
     public static string ScoutItemName(string locationName, out string playerName, out bool isCurrentPlayer)
     {
-        if (!Connected)
+        if (!IsConnected)
         {
             playerName = "error";
             isCurrentPlayer = false;
@@ -200,14 +209,19 @@ public static class MultiClient
     // Disconnect client if connected
     public static void Disconnect()
     {
-        if (!Connected)
+        // Remove listener and confirm if connected
+        if (isSubscribed) RandomActionHandler.onLocationCheck.RemoveListener(OnLocationChecked);
+        if (!IsConnected)
         {
             session = null;
             return;
         }
 
+        // Unsubscrib
         session.Socket.SocketClosed -= OnSocketClosed;
         session.Socket.ErrorReceived -= ErrorRecieved;
+
+        // Disconnect
         session.Socket.DisconnectAsync();
         session = null;
     }
