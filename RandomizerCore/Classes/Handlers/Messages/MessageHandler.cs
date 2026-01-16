@@ -14,7 +14,7 @@ public static class MessageHandler
     private static Canvas canvas;
     private static TextMeshProUGUI messageTextPrefab;
 
-    private static List<MessageText> messageObjects;
+    private static readonly List<MessageText> messageObjects = [];
 
     private static TextMeshProUGUI CreateText(float x, float y,
         HorizontalAlignmentOptions horizontal = HorizontalAlignmentOptions.Left,
@@ -39,20 +39,21 @@ public static class MessageHandler
 
     public static void Init()
     {
+        // Subscribers
         RandomActionHandler.onLocationGet.AddListener(OnLocationGet);
         RandomActionHandler.onItemGet.AddListener(OnItemGet);
-        messageObjects = [];
+        GameDataActions.OnFileQuit.AddListener(OnFileQuit);
 
+        // Create canvas
         canvas = new GameObject().AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.worldCamera = Plugin.FindFirstObjectByType<Camera>();
         canvas.sortingOrder = 100;
         canvas.transform.SetParent(Plugin.I.transform);
 
+        // Create text prefab
         messageTextPrefab = CreateText(30, 0);
         messageTextPrefab.gameObject.SetActive(false);
-
-        GameDataActions.OnFileQuit.AddListener(OnFileQuit);
     }
     private static void OnFileQuit()
     {
@@ -78,17 +79,19 @@ public static class MessageHandler
             text += $" ({DataStorage.FoundCollectable(item.collectable, item.GetName())}/{EnumProperties.CollectableCounts[item.collectable]})";
 
         if (isCurrentPlayer) CreateText(text);
-        else CreateText($"{text} - From: {playerName}");
+        else CreateText($"{text} - From: {playerName}"); // Add who the item is from if remote
     }
 
     public static void CreateText(string displayText, bool permanent = false, Color? color = null)
     {
         Plugin.Logger.LogMessage($"Creating {(permanent ? "permanent" : "")} text '{displayText}'");
 
+        // Create the object
         TextMeshProUGUI tmp = Plugin.Instantiate(messageTextPrefab, canvas.transform);
         tmp.transform.position = messageTextPrefab.transform.position;
         MessageText messageText = new(tmp, permanent);
 
+        // Start the object, bump up other texts, and add it to the list
         messageText.Begin(displayText, color == null ? Color.white : (Color)color);
         foreach (MessageText text in messageObjects) text.Bump();
         messageObjects.Add(messageText);
@@ -99,6 +102,7 @@ public static class MessageHandler
         int index = 0;
         while (index < messageObjects.Count)
         {
+            // If they are finished remove them (text handles destroying themselves)
             if (messageObjects[index].Update()) messageObjects.RemoveAt(index);
             else index++;
         }
