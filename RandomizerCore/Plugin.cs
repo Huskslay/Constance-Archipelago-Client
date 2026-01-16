@@ -1,13 +1,16 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
+using Constance;
 using HarmonyLib;
 using RandomizerCore.Classes.Archipelago;
 using RandomizerCore.Classes.Data;
 using RandomizerCore.Classes.Data.Saved;
+using RandomizerCore.Classes.Data.Types.Regions;
 using RandomizerCore.Classes.Handlers;
 using RandomizerCore.Classes.Handlers.Files;
 using RandomizerCore.Classes.Handlers.Messages;
 using RandomizerCore.Classes.Handlers.State;
+using UnityEngine.InputSystem;
 
 namespace RandomizerCore;
 

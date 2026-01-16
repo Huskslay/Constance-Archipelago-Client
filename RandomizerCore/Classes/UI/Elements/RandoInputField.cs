@@ -35,10 +35,10 @@ public class RandoInputField
         this.onUpdate?.Invoke(this, input);
     }
 
-    public void OnClick(RandoButton _) 
-    { 
+    public void OnClick(RandoButton _)
+    {
         onClick?.Invoke();
-        active = true; 
+        active = true;
     }
 
     public void SetInput(string newInput, bool force = false)

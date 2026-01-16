@@ -24,6 +24,10 @@ public class RegionHandler : SavedDataOwnerHandler<Region, RegionSavedData>
     }
 
 
+    public static IEnumerator LoadRegion(Region region, CConPlayerEntity player = null, Direction direction = null)
+    {
+        yield return LoadRegion(new ConLevelId($"Prod_{region.GetName()}"), player: player, direction: direction);
+    }
     public static IEnumerator LoadRegion(ConCheckPointId id, CConPlayerEntity player = null, Direction direction = null)
     {
         yield return LoadRegion(id.ExtractLevelId(), player: player, id: id, direction: direction);

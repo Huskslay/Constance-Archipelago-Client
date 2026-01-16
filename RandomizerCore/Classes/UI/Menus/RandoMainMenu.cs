@@ -31,13 +31,13 @@ public class RandoMainMenu : AConStartMenuPanel, IConSelectionLayer, ITransformP
 
     public void Init()
     {
-        urlInput = new(transform, "Url: ", url, false, 
+        urlInput = new(transform, "Url: ", url, false,
             (button, newValue) => OnUpdateText(ref url, button, newValue), DisableAll);
-        portInput = new(transform, "Port: ", port.ToString(), true, 
+        portInput = new(transform, "Port: ", port.ToString(), true,
             (button, newValue) => OnUpdateInt(ref port, button, newValue), DisableAll);
-        slotInput = new(transform, "Slot: ", slot, false, 
+        slotInput = new(transform, "Slot: ", slot, false,
             (button, newValue) => OnUpdateText(ref slot, button, newValue), DisableAll);
-        pwInput = new(transform, "Password: ", password, false, 
+        pwInput = new(transform, "Password: ", password, false,
             (button, newValue) => OnUpdateText(ref password, button, newValue), DisableAll);
 
         CConStartMenu_Patch.CreateBlock(50, 60, transform);
