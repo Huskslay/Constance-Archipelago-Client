@@ -75,7 +75,7 @@ public static class MultiClient
             Plugin.Logger.LogError(errorMessage);
             return result;
         }
-        
+
         // Login succeeded, intialize the rest and return success
         LoginSuccessful success = (LoginSuccessful)result;
         playerSlot = success.Slot;

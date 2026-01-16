@@ -1,5 +1,4 @@
-﻿using Btf.SaveData;
-using FileHandler.Classes;
+﻿using FileHandler.Classes;
 using RandomizerCore.Classes.Data.Saved;
 using RandomizerCore.Classes.Data.Types.AItems;
 using RandomizerCore.Classes.Data.Types.AItems.Types;
@@ -83,7 +82,8 @@ public abstract class SavedDataOwnerHandler<T1, T2> where T1 : ISavedDataOwner<T
     private void LoadAll<T>(List<T> objects, Func<T, string> getName, Action<T> onEach)
     {
         HashSet<string> names = [];
-        foreach (T obj in objects) {
+        foreach (T obj in objects)
+        {
             if (obj == null)
             {
                 Plugin.Logger.LogError($"Null found");
