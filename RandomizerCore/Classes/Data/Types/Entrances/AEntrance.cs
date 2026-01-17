@@ -13,7 +13,7 @@ public abstract class AEntrance : ISavedDataOwner<AEntranceSavedData>
     public AEntranceSavedData GetSavedData() { return savedData; }
     public void SetSavedData(AEntranceSavedData savedData, bool save = true)
     {
-        if (save) EntranceHandler.I.Save(savedData, this);
+        if (save) EntranceHandler.I.Save(savedData);
         this.savedData = savedData;
     }
 }

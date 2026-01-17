@@ -42,10 +42,12 @@ public static class DataConverter
         foreach (TeleportEntrance entrance in entrances.FindAll(x => x.GetType() == typeof(TeleportEntrance))
             .ConvertAll(x => (TeleportEntrance)x))
         {
+            TeleportEntrance connection = entrance.GetConnection();
+
             output += $"{entrance.GetName().Replace("-", "_")} = (" +
                 $"\"{entrance.GetName()}\", " +
                 $"\"{entrance.region}\", " +
-                $"\"{entrance.connectionRegion}\", " +
+                $"\"{(connection == null ? "null" : connection.GetName())}\", " +
             $")\n";
         }
         List<ElevatorEntrance> elevators = entrances.FindAll(x => x.GetType() == typeof(ElevatorEntrance))

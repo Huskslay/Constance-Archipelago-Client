@@ -54,7 +54,7 @@ public class Item : ISavedDataOwner<ItemSavedData>
     public ItemSavedData GetSavedData() { return savedData; }
     public void SetSavedData(ItemSavedData savedData, bool save = true)
     {
-        if (save) ItemHandler.I.Save(savedData, this);
+        if (save) ItemHandler.I.Save(savedData);
         this.savedData = savedData;
     }
 }

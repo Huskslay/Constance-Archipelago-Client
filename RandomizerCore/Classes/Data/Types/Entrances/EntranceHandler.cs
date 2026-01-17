@@ -1,5 +1,4 @@
 ﻿using RandomizerCore.Classes.Data.Types.Entrances.Types;
-using RandomizerCore.Classes.Data.Types.Locations;
 
 namespace RandomizerCore.Classes.Data.Types.Entrances;
 

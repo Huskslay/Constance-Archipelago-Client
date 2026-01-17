@@ -24,7 +24,7 @@ public static class MultiClient
     public static string SlotName { get; private set; }
 
 
-    private static ArchipelagoSession session;
+    private static ArchipelagoSession  session;
     private static int playerSlot;
 
 

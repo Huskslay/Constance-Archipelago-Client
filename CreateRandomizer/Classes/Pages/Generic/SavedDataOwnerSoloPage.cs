@@ -1,9 +1,6 @@
-﻿using CheatMenu.Classes;
-using RandomizerCore.Classes.Data;
-using RandomizerCore.Classes.Data.EntranceRules;
+﻿using RandomizerCore.Classes.Data;
 using RandomizerCore.Classes.Data.Saved;
 using System;
-using UnityEngine;
 
 namespace CreateRandomizer.Classes.Pages.Generic;
 

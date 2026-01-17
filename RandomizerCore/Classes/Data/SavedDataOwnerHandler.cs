@@ -107,18 +107,18 @@ public abstract class SavedDataOwnerHandler<T1, T2> where T1 : ISavedDataOwner<T
 
 
 
-    public void Save(T1 data)
+    public void Save(T1 data, bool log = true)
     {
         if (dataOwners.ContainsKey(data.GetName())) dataOwners[data.GetName()] = data;
         else dataOwners.Add(data.GetName(), data);
-        FileSaveLoader.TrySaveClassToFile(dataOwners.Values.ToList(), FolderPath, GetName());
+        FileSaveLoader.TrySaveClassToFile(dataOwners.Values.ToList(), FolderPath, GetName(), logSuccess: log);
     }
-    public void Save(T2 data, T1 owner)
+    public void Save(T2 data, bool log = true)
     {
         T2 current = savedDatas.Find(x => x.connection == data.connection);
         if (current != null) savedDatas.Remove(current);
         savedDatas.Add(data);
-        FileSaveLoader.TrySaveClassToJson(savedDatas, SavedDataFolderPath, GetName());
+        FileSaveLoader.TrySaveClassToJson(savedDatas, SavedDataFolderPath, GetName(), logSuccess: log);
     }
 
     public T1 GetFromName(string name)

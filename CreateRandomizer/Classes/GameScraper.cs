@@ -13,7 +13,6 @@ using RandomizerCore.Classes.Enums;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Xml.Linq;
 using UnityEngine;
 
 namespace CreateRandomizer.Classes;
@@ -21,6 +20,8 @@ namespace CreateRandomizer.Classes;
 public static class GameScraper
 {
     private static List<string> hasShrines;
+    private static Dictionary<string, List<TeleportEntrance>> entrances;
+    private static List<TeleportEntrance> entrances2;
 
     public static void Scrape()
     {
@@ -31,25 +32,35 @@ public static class GameScraper
     {
         Plugin.FindFirstObjectByType<CConTimelinePlayerController>().enabled = false; // Throws errors
         CConPlayerEntity player = Plugin.FindFirstObjectByType<CConPlayerEntity>();
+        ConStateAbility_Player_Transition transitionAbility = player.SM.TransitionAbility;
+        CConTransitionManager transitionManager = transitionAbility.TransitionManager;
+
+        // Prepare
+        hasShrines = ["Prod_V01:cp_Prod_V01_a15fffec-931b-4c37-8dac-6f4c1e742549"];
+        entrances = []; entrances2 = [];
 
         // Scenes
-        hasShrines = ["Prod_V01:cp_Prod_V01_a15fffec-931b-4c37-8dac-6f4c1e742549"];
         foreach (string scene in SceneHandler.scenes)
-            yield return ScrapeLevel(scene, player);
+            yield return ScrapeLevel(scene, player, transitionManager);
+
+        // Finish up 
+        ConnectEntrances();
+        CreateSavedDatas();
         FileSaveLoader.TrySaveClassToJson(hasShrines, ["Output"], "shrines");
 
         // Flashbacks
         foreach (string scene in SceneHandler.flashbackScenes)
-            yield return ScrapeFlashback(scene, player);
+            yield return ScrapeFlashback(scene, player, transitionManager);
     }
 
 
-    private static IEnumerator ScrapeLevel(string scene, CConPlayerEntity player)
+    private static IEnumerator ScrapeLevel(string scene, CConPlayerEntity player, CConTransitionManager transitionManager)
     {
-        Plugin.Logger.LogMessage($"~~~~~~~~~~~~~\nLoading {scene}");
+        Plugin.Logger.LogMessage($"~~~~~~~~~~~~~ Loading {scene} \"~~~~~~~~~~~~~");
 
         // Level
         ConLevelId levelId = new(scene);
+        yield return new WaitUntil(() => !transitionManager.IsRunning);
         yield return RegionHandler.LoadRegion(levelId, player: player);
         Region region = new(scene);
 
@@ -57,28 +68,31 @@ public static class GameScraper
         CConMeditationPointEntity shrine = Plugin.FindFirstObjectByType<CConMeditationPointEntity>();
         if (shrine != null) hasShrines.Add(scene + ":" + shrine.checkPoint.checkPointId.StringValue);
 
-        // Set
-        region.entrances = GetEntrances(region);
+        // Locations & entrances
         region.locations = CreateLocations(region);
-
-        // Saved Data
-        MakeSavedData<AEntranceSavedData, AEntrance, EntranceHandler>(region, skipDupeNames: true, EntranceHandler.I, region.entrances);
-        MakeSavedData<ALocationSavedData, ALocation, LocationHandler>(region, skipDupeNames: false, LocationHandler.I, region.locations);
+        CreateEntrances(region);
 
         // Save
         RegionHandler.I.Save(region);
     }
 
-    private static IEnumerator ScrapeFlashback(string scene, CConPlayerEntity player)
+    private static IEnumerator ScrapeFlashback(string scene, CConPlayerEntity player, CConTransitionManager transitionManager)
     {
-        Plugin.Logger.LogMessage($"~~~~~~~~~~~~~\nLoading {scene}");
+        Plugin.Logger.LogMessage($"~~~~~~~~~~~~~ Loading {scene} ~~~~~~~~~~~~~");
+        if (scene == "Prod_Flashback_IntroCutscene") yield break;
 
         // Level
         ConLevelId levelId = new(scene);
+        yield return new WaitUntil(() => !transitionManager.IsRunning);
         yield return RegionHandler.LoadRegion(levelId, player);
 
         // Get exit region
         CConLevel_Flashback level = Plugin.FindFirstObjectByType<CConLevel_Flashback>();
+        if (level == null || level.exitToCheckPoint == null)
+        {
+            Plugin.Logger.LogError("Could not get CConLevel_Flashback");
+            yield break;
+        }
         if (!level.exitToCheckPoint.TryExtractLevelId(out ConLevelId exit))
         {
             Plugin.Logger.LogError("Could not get exit id");
@@ -89,6 +103,7 @@ public static class GameScraper
             Plugin.Logger.LogError("Could not get exit region");
             yield break;
         }
+        if (level.tearUnlock == null) yield break;
 
         // Add tear to exit region
         TearLocation tearLocation = new(level.tearUnlock, exitRegion);
@@ -152,56 +167,76 @@ public static class GameScraper
 
 
 
-    private static List<string> GetEntrances(Region region)
+    private static void CreateEntrances(Region region)
     {
-        List<string> entrances = [];
-        CConLevel_Adventure level = Plugin.FindFirstObjectByType<CConLevel_Adventure>();
+        //CConLevel_Adventure level = Plugin.FindFirstObjectByType<CConLevel_Adventure>();
+        entrances.Add(region.GetName(), []);
 
         foreach (CConTeleportPoint tp_point in
             Plugin.FindObjectsByType<CConTeleportPoint>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
-            bool completed = false;
-            foreach (SConLevelInfo.TransitionInfo info in level.LevelInfo.transitionsTo)
-            {
-                string region1 = info.id.Level1.StringValue.Replace("Prod_", "");
-                string region2 = info.id.Level2.StringValue.Replace("Prod_", "");
+            string name = FileSaveLoader.FourDigitHash(tp_point.teleportTo.stringValue);
 
-                if (region1 == region.name || region2 == region.name)
-                {
-                    completed = true;
+            TeleportEntrance entrance = new(
+                name, region, tp_point.teleportTo,
+                tp_point.FromCheckPoint == null ? new("") : tp_point.FromCheckPoint.CheckPointId,
+                tp_point.name
+            );
 
-                    string connectionRegion = region1 == region.name ? region2 : region1;
-                    string chpt = region1 == region.name ? info.id.checkPoint2.StringValue : info.id.checkPoint1.StringValue;
-                    string connectionChpt = region1 == region.name ? info.id.checkPoint1.StringValue : info.id.checkPoint2.StringValue;
-
-                    string name = FileSaveLoader.FourDigitHash(chpt);
-                    string connectionName = FileSaveLoader.FourDigitHash(connectionChpt);
-                    TeleportEntrance entrance = new(name, region, connectionName, connectionRegion, tp_point.teleportTo);
-                    entrances.Add(entrance.GetName());
-
-                    break;
-                }
-            }
-            if (!completed)
-            {
-                Plugin.Logger.LogWarning($"Could not find connection for transtion: {tp_point.name}");
-                string name = FileSaveLoader.FourDigitHash(tp_point.teleportTo.StringValue);
-                TeleportEntrance entrance = new(name, region, null, null, tp_point.teleportTo);
-                entrances.Add(entrance.GetName());
-            }
+            entrances[region.GetName()].Add(entrance);
+            entrances2.Add(entrance);
         }
 
         CConElevatorBehaviour elevator = Plugin.FindFirstObjectByType<CConElevatorBehaviour>(FindObjectsInactive.Exclude);
         if (elevator != null)
         {
             ElevatorEntrance entrance = new(region);
-            entrances.Add(entrance.GetName());
+            region.entrances.Add(entrance.GetName());
         }
 
-        Plugin.Logger.LogMessage($"Found: {entrances.Count} Entrances, Elevator: {elevator != null}");
-        return entrances;
+        Plugin.Logger.LogMessage($"Found: {entrances[region.GetName()].Count} Entrances, Elevator: {elevator != null}");
+    }
+    private static void ConnectEntrances()
+    {
+        List<Region> regions = [.. RegionHandler.I.dataOwners.Values];
+        foreach (Region region in regions)
+        {
+            region.entrances = [];
+            if (entrances.ContainsKey(region.GetName())) ConnectEntrances(region);
+            RegionHandler.I.Save(region);
+        }
+    }
+    private static void ConnectEntrances(Region region)
+    {
+        foreach (TeleportEntrance entrance in entrances[region.GetName()])
+        {
+            string teleportFromCheckpoint = entrance.teleportFromCheckpoint.stringValue;
+
+            if (teleportFromCheckpoint != "")
+            {
+                foreach (TeleportEntrance entrance2 in entrances2)
+                {
+                    if (entrance2.teleportToCheckpoint.stringValue != teleportFromCheckpoint) continue;
+                    entrance.Connect(entrance2.name, entrance2.region);
+                }
+            }
+
+            entrance.SetSavedData(new(entrance.GetName()));
+            EntranceHandler.I.Save(entrance);
+            region.entrances.Add(entrance.GetName());
+        }
     }
 
+
+    private static void CreateSavedDatas()
+    {
+        List<Region> regions = [.. RegionHandler.I.dataOwners.Values];
+        foreach (Region region in regions)
+        {
+            MakeSavedData<AEntranceSavedData, AEntrance, EntranceHandler>(region, skipDupeNames: true, EntranceHandler.I, region.entrances);
+            MakeSavedData<ALocationSavedData, ALocation, LocationHandler>(region, skipDupeNames: false, LocationHandler.I, region.locations);
+        }
+    }
     private static void MakeSavedData<T1, T2, T3>(Region region, bool skipDupeNames, T3 handler, List<string> owners)
         where T1 : EntranceRuleSavedData where T2 : ISavedDataOwner<T1> where T3 : SavedDataOwnerHandler<T2, T1>
     {

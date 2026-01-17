@@ -30,7 +30,7 @@ public abstract class AItem : ISavedDataOwner<AItemSavedData>
     public AItemSavedData GetSavedData() { return savedData; }
     public void SetSavedData(AItemSavedData savedData, bool save = true)
     {
-        if (save) AItemHandler.I.Save(savedData, this);
+        if (save) AItemHandler.I.Save(savedData);
         this.savedData = savedData;
     }
 }

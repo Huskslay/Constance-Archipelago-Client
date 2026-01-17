@@ -5,36 +5,33 @@ using System;
 namespace RandomizerCore.Classes.Data.Types.Entrances.Types;
 
 [Serializable]
-public class TeleportEntrance : AEntrance
+public class TeleportEntrance(string name, Region region,
+    ConCheckPointId teleportToCheckpoint, ConCheckPointId teleportFromCheckpoint, string goName) : AEntrance
 {
-    public string name;
-    public string region;
-    public string connectionName;
-    public string connectionRegion;
-    public ConCheckPointId teleportToCheckpoint;
+    public string name = name;
+    public string region = region.name;
+    public string connectionName = null;
+    public string connectionRegion = null;
 
-    public override string GetName() => GetName(name, region, connectionRegion);
+    public string goName = goName;
+    public ConCheckPointId teleportToCheckpoint = teleportToCheckpoint;
+    public ConCheckPointId teleportFromCheckpoint = teleportFromCheckpoint;
+
+    public override string GetName() => $"{region}-{connectionRegion ?? "???"}-{name}";
 
     public TeleportEntrance GetConnection()
     {
+        if (GetSavedData().overrideEntrance) connectionName = GetSavedData().entranceOverride;
         if (connectionName == null) return null;
-        return (TeleportEntrance)EntranceHandler.I.GetFromName(connectionName);
+
+        AEntrance connection = EntranceHandler.I.GetFromName(connectionName);
+        if (connection is not TeleportEntrance teleportEntrance) return null;
+        return teleportEntrance;
     }
 
-    public TeleportEntrance(string name, Region region, string connectionName, string connectionRegion, ConCheckPointId teleportToCheckpoint)
+    public void Connect(string connectionName, string connectionRegion)
     {
-        this.name = name;
-        this.region = region.name;
-        this.connectionName = connectionName == null ? null : GetName(connectionName, connectionRegion, region.name);
+        this.connectionName = $"{connectionRegion}-{region}-{connectionName}";
         this.connectionRegion = connectionRegion;
-        this.teleportToCheckpoint = teleportToCheckpoint;
-
-        SetSavedData(new(GetName()));
-        EntranceHandler.I.Save(this);
-    }
-
-    public static string GetName(string name, string region, string connectionRegion)
-    {
-        return $"{region}-{connectionRegion ?? "???"}-{name}";
     }
 }

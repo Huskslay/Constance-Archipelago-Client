@@ -64,7 +64,7 @@ public abstract class ALocation : ISavedDataOwner<ALocationSavedData>
     public ALocationSavedData GetSavedData() { return savedData; }
     public void SetSavedData(ALocationSavedData savedData, bool save = true)
     {
-        if (save) LocationHandler.I.Save(savedData, this);
+        if (save) LocationHandler.I.Save(savedData);
         this.savedData = savedData;
     }
 }

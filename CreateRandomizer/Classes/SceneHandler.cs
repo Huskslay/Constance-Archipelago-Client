@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using FileHandler.Classes;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine.SceneManagement;
 
@@ -21,5 +22,9 @@ public static class SceneHandler
             }
         }
         Plugin.Logger.LogMessage($"Total scenes: {scenes.Count}");
+        List<string> allScenes = [];
+        allScenes.AddRange(scenes);
+        allScenes.AddRange(flashbackScenes);
+        FileSaveLoader.TrySaveClassToJson(allScenes, ["Output"], "scenes");
     }
 }

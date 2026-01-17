@@ -6,5 +6,6 @@ namespace RandomizerCore.Classes.Data.Types.Entrances;
 [Serializable]
 public class AEntranceSavedData(string connection) : EntranceRuleSavedData(connection)
 {
-
+    public bool overrideEntrance = false;
+    public string entranceOverride = "";
 }

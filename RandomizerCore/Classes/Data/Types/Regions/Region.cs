@@ -27,7 +27,7 @@ public class Region : ISavedDataOwner<RegionSavedData>
     public RegionSavedData GetSavedData() { return savedData; }
     public void SetSavedData(RegionSavedData savedData, bool save = true)
     {
-        if (save) RegionHandler.I.Save(savedData, this);
+        if (save) RegionHandler.I.Save(savedData);
         this.savedData = savedData;
     }
 }

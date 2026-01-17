@@ -5,14 +5,14 @@ using RandomizerCore.Classes.Handlers.State;
 
 namespace RandomizerCore.Patches.Fixes.AllowDashlessWallDive;
 
-[HarmonyPatch(typeof(AConState_Player<Leo.Void>))]
+[HarmonyPatch(typeof(AConState_Player<Void>))]
 internal class AConState_Player_LeoVoid_Patch
 {
     public static bool FakeDash = false;
 
     [HarmonyPrefix]
-    [HarmonyPatch(nameof(AConState_Player<>.TryInitDashState), [typeof(IConStateUpdate), typeof(float), typeof(DirectionX?)], [ArgumentType.Out, ArgumentType.Normal, ArgumentType.Normal])]
-    private static bool TryInitDashState_Prefix(AConState_Player<Leo.Void> __instance, ref bool __result, out IConStateUpdate dashState, float buffer, DirectionX? forceDir = null)
+    [HarmonyPatch(nameof(AConState_Player<Void>.TryInitDashState), [typeof(IConStateUpdate), typeof(float), typeof(DirectionX?)], [ArgumentType.Out, ArgumentType.Normal, ArgumentType.Normal])]
+    private static bool TryInitDashState_Prefix(AConState_Player<Void> __instance, ref bool __result, out IConStateUpdate dashState, float buffer, DirectionX? forceDir = null)
     {
         dashState = null;
         __result = false;
@@ -38,7 +38,7 @@ internal class AConState_Player_LeoVoid_Patch
     }
 
     [HarmonyPostfix]
-    [HarmonyPatch(nameof(AConState_Player<>.TryInitDashState), [typeof(IConStateUpdate), typeof(float), typeof(DirectionX?)], [ArgumentType.Out, ArgumentType.Normal, ArgumentType.Normal])]
+    [HarmonyPatch(nameof(AConState_Player<Void>.TryInitDashState), [typeof(IConStateUpdate), typeof(float), typeof(DirectionX?)], [ArgumentType.Out, ArgumentType.Normal, ArgumentType.Normal])]
     private static void TryInitDashState_Postfix()
     {
         FakeDash = false;

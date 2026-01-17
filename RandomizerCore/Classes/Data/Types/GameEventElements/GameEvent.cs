@@ -16,7 +16,7 @@ public class GameEvent(GameEvents gameEvent) : ISavedDataOwner<GameEventSavedDat
     public GameEventSavedData GetSavedData() { return savedData; }
     public void SetSavedData(GameEventSavedData savedData, bool save = true)
     {
-        if (save) GameEventHandler.I.Save(savedData, this);
+        if (save) GameEventHandler.I.Save(savedData);
         this.savedData = savedData;
     }
 }

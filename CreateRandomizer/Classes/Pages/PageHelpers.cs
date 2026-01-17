@@ -2,14 +2,13 @@
 using Constance;
 using RandomizerCore.Classes.Data.EntranceRules;
 using RandomizerCore.Classes.Data.Saved;
-using RandomizerCore.Classes.Data.Types.Entrances;
 using RandomizerCore.Classes.Data.Types.Entrances.Types;
 using RandomizerCore.Classes.Data.Types.Locations;
 using RandomizerCore.Classes.Data.Types.Regions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 using UnityEngine;
 
 namespace CreateRandomizer.Classes.Pages;
@@ -59,23 +58,25 @@ public static class PageHelpers
 
 
 
-    public static IEnumerator LoadTransition(TeleportEntrance entrance)
+    public static IEnumerator LoadEntrance(TeleportEntrance entrance)
     {
-        //if (entrance.GetSavedData().doOverrideTransition)
-        //{
-        //    yield return RegionsHandler.I.LoadLevel(entrance.GetRegion());
-
-        //    CConTeleportPoint tp = Plugin.FindObjectsByType<CConTeleportPoint>(FindObjectsInactive.Include, FindObjectsSortMode.None).ToList().Find(x => x.teleportTo.StringValue == entrance.teleportToCheckPoint);
-
-        //    CConPlayerEntity player = Plugin.FindFirstObjectByType<CConPlayerEntity>();
-        //    player.transform.position = tp.transform.position;
-        //}
-        //else 
         TeleportEntrance connection = entrance.GetConnection();
-        if (connection == null) yield break;
+
+        if (entrance.GetSavedData().overrideEntrance || entrance.GetConnection() == null)
+        {
+            yield return RegionHandler.LoadRegion(RegionHandler.I.GetFromName(entrance.region));
+
+            CConTeleportPoint tp = Plugin.FindObjectsByType<CConTeleportPoint>(FindObjectsInactive.Include, FindObjectsSortMode.None)
+                .ToList().Find(x => x.teleportTo.StringValue == entrance.teleportToCheckpoint.stringValue);
+
+            CConPlayerEntity player = Plugin.FindFirstObjectByType<CConPlayerEntity>();
+            player.transform.position = tp.transform.position;
+            yield break;
+        }
+
         yield return RegionHandler.LoadRegion(connection.teleportToCheckpoint);
     }
-    public static IEnumerator LoadTransition(ElevatorEntrance entrance)
+    public static IEnumerator LoadEntrance(ElevatorEntrance entrance)
     {
         yield return RegionHandler.LoadRegion(RegionHandler.I.GetFromName(entrance.region));
 

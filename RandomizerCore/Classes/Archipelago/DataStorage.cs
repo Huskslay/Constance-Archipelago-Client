@@ -1,9 +1,9 @@
 ﻿using Archipelago.MultiClient.Net;
-using Archipelago.MultiClient.Net.Enums;
 using Constance;
 using Newtonsoft.Json.Linq;
 using RandomizerCore.Classes.Enums;
 using System.Collections.Generic;
+using Archipelago.MultiClient.Net.Enums;
 
 namespace RandomizerCore.Classes.Archipelago;
 
