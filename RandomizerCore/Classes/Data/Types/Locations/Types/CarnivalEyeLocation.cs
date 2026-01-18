@@ -26,7 +26,7 @@ public class CarnivalEyeLocation : ALocation
     {
         id = eye.persistable.PersistenceId;
 
-        CreateItem(eye, region);
+        baseItem = CreateItem(eye, region).GetName();
         LocationHandler.I.Save(this);
     }
 

@@ -1,7 +1,7 @@
 ﻿using Constance;
 using FileHandler.Classes;
 using RandomizerCore.Classes.Data;
-using RandomizerCore.Classes.Data.EntranceRules;
+using RandomizerCore.Classes.Data.Rules;
 using RandomizerCore.Classes.Data.Saved;
 using RandomizerCore.Classes.Data.Types.Entrances;
 using RandomizerCore.Classes.Data.Types.Entrances.Types;
@@ -51,8 +51,12 @@ public static class GameScraper
         // Flashbacks
         foreach (string scene in SceneHandler.flashbackScenes)
             yield return ScrapeFlashback(scene, player, transitionManager);
-    }
 
+        // Events
+        CreateEvents();
+
+        Plugin.Logger.LogMessage("Done");
+    }
 
     private static IEnumerator ScrapeLevel(string scene, CConPlayerEntity player, CConTransitionManager transitionManager)
     {
@@ -201,7 +205,6 @@ public static class GameScraper
         List<Region> regions = [.. RegionHandler.I.dataOwners.Values];
         foreach (Region region in regions)
         {
-            region.entrances = [];
             if (entrances.ContainsKey(region.GetName())) ConnectEntrances(region);
             RegionHandler.I.Save(region);
         }
@@ -244,24 +247,23 @@ public static class GameScraper
         {
             T2 owner = handler.GetFromName(ownerName);
             T1 savedData = owner.GetSavedData();
-            foreach (string entranceName in region.entrances)
-            {
-                if (skipDupeNames && entranceName == ownerName) continue;
-                EntranceRule rule = savedData.entranceRules.Find(x => x.entrance == entranceName);
-                if (rule == null)
-                {
-                    rule ??= new(entranceName);
-                    savedData.entranceRules.Add(rule);
-                }
-                foreach (CollectableItems collectableItem in Enum.GetValues(typeof(CollectableItems)))
-                {
-                    CollectableItemEntry entry = rule.collectableItems.Find(x => x.item == collectableItem);
-                    if (entry != null) continue;
-                    rule.collectableItems.Add(new(collectableItem));
-                }
-            }
+            CreateEntranceRules(ref savedData.entranceRules, region, skipDupeNames ? ownerName : null);
             owner.SetSavedData(savedData);
         }
+    }
+    public static EntranceRules CreateEntranceRules(ref EntranceRules entranceRules, Region region, string skipName)
+    {
+        foreach (string entranceName in region.entrances)
+        {
+            if (skipName != null && entranceName == skipName) continue;
+            EntranceRule rule = entranceRules.entranceRules.Find(x => x.entrance == entranceName);
+            if (rule == null)
+            {
+                rule ??= new(entranceName);
+                entranceRules.entranceRules.Add(rule);
+            }
+        }
+        return entranceRules;
     }
     public static List<string> GetLocations<T1>(Region region, string name, FindObjectsInactive findInactive, Func<T1, Region, ALocation> constructor)
         where T1 : MonoBehaviour
@@ -274,5 +276,54 @@ public static class GameScraper
         }
         Plugin.Logger.LogMessage($"Found: {locations.Count} {name}");
         return locations;
+    }
+
+
+    private static void CreateEvents()
+    {
+        foreach (GameEvents gameEvent in Enum.GetValues(typeof(GameEvents)))
+        {
+            if (gameEvent == GameEvents.None) continue;
+            if (!EnumProperties.EventRegions.ContainsKey(gameEvent))
+            {
+                Plugin.Logger.LogError($"Event '{gameEvent}' does not have an assosiated region in enum properties");
+                continue;
+            }
+
+            Region region = RegionHandler.I.GetFromName(EnumProperties.EventRegions[gameEvent]);
+            if (region == null)
+            {
+                Plugin.Logger.LogError($"Event '{gameEvent}' has a null region in enum properties dictionary");
+                continue;
+            }
+
+            region.givenEvents |= gameEvent;
+            RegionHandler.I.Save(region);
+        }
+
+        foreach (Region region in RegionHandler.I.dataOwners.Values)
+        {
+            GameEvents givenEvents = region.givenEvents;
+            RegionSavedData savedData = region.GetSavedData();
+
+            foreach (GameEvents gameEvent in Enum.GetValues(typeof(GameEvents)))
+            {
+                if (gameEvent == GameEvents.None) continue;
+
+                if (givenEvents.HasFlag(gameEvent))
+                {
+                    EventGiver giver = savedData.givenEvents.Find(x => x.gameEvent == gameEvent);
+                    if (giver == null) savedData.givenEvents.Add(new(gameEvent));
+                    CreateEntranceRules(ref savedData.givenEvents[^1].entranceRules, region, null);
+                }
+                else
+                {
+                    EventGiver giver = savedData.givenEvents.Find(x => x.gameEvent == gameEvent);
+                    if (giver == null) savedData.givenEvents.Remove(giver);
+                }
+            }
+
+            region.SetSavedData(savedData);
+        }
     }
 }

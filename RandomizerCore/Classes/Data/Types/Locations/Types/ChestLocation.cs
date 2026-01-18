@@ -19,7 +19,7 @@ public class ChestLocation : ALocation
 
     public ChestLocation(CConChestEntity chest, Region region) : base(GetName(chest), region, chest.name)
     {
-        CreateItem(chest, region);
+        baseItem = CreateItem(chest, region).GetName();
         LocationHandler.I.Save(this);
     }
 

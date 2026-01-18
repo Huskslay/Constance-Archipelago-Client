@@ -16,7 +16,7 @@ public class LightStoneLocation : ALocation
 
     public LightStoneLocation(CConCurrencyDepositEntity deposit, Region region) : base(GetName(deposit), region, deposit.name)
     {
-        CreateItem(deposit, region);
+        baseItem = CreateItem(deposit, region).GetName();
         LocationHandler.I.Save(this);
     }
 

@@ -3,7 +3,10 @@ using Constance;
 using CreateRandomizer.Classes.Pages.Generic;
 using RandomizerCore.Classes.Data.Types.Entrances;
 using RandomizerCore.Classes.Data.Types.Entrances.Types;
-using System.Linq;
+using RandomizerCore.Classes.Enums;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace CreateRandomizer.Classes.Pages.Entrances;
@@ -19,6 +22,7 @@ public class EntrancesSoloPage : SoloGUIPage
         soloPage = new();
         base.Init(modGUI, parent, id);
         selectedEntranceRule = null;
+        windowRect = PageHelpers.NewSoloPageRect;
     }
 
     public void Open(AEntrance entrance)
@@ -35,26 +39,17 @@ public class EntrancesSoloPage : SoloGUIPage
 
     private void DrawSavedData(AEntranceSavedData savedData)
     {
-        PageHelpers.DrawEntranceRuleSavedData(savedData, ref selectedEntranceRule);
-    }
+        savedData.lockState = GUIElements.ListValue("Lock State", savedData.lockState, 
+            (IEnumerable<EntranceLockState>)Enum.GetValues(typeof(EntranceLockState)), 
+            (previous, check, _) => previous == check, (value) => value.ToString()
+        );
 
-    public override void UpdateOpen()
-    {
-        base.UpdateOpen();
-        if (!soloPage.OwnerSet) return;
+        GUIElements.ElipseLine();
 
-        if (soloPage.Owner is TeleportEntrance teleportEntrance)
+        savedData.overrideConnection = GUIElements.BoolValue("Override connection", savedData.overrideConnection);
+        if (savedData.overrideConnection)
         {
-            if (GUILayout.Button($"Teleport to {(teleportEntrance.GetSavedData().overrideEntrance || teleportEntrance.GetConnection() == null ? "Jank" : "")}"))
-                StartCoroutine(PageHelpers.LoadEntrance(teleportEntrance));
-        }
-        else if (soloPage.Owner is ElevatorEntrance elevatorEntrance && GUILayout.Button("Teleport to elevator"))
-            StartCoroutine(PageHelpers.LoadEntrance(elevatorEntrance));
-
-        soloPage.Owner.GetSavedData().overrideEntrance = GUIElements.BoolValue("Override entrance", soloPage.Owner.GetSavedData().overrideEntrance);
-        if (soloPage.Owner.GetSavedData().overrideEntrance)
-        {
-            soloPage.Owner.GetSavedData().entranceOverride = GUIElements.StringValue(soloPage.Owner.GetSavedData().entranceOverride);
+            savedData.connectionOverride = GUIElements.StringValue(savedData.connectionOverride);
             if (GUILayout.Button("To nearest"))
             {
                 CConPlayerEntity player = FindFirstObjectByType<CConPlayerEntity>();
@@ -71,17 +66,32 @@ public class EntrancesSoloPage : SoloGUIPage
                     }
                 }
 
-                foreach (TeleportEntrance entrance in EntranceHandler.I.dataOwners.Values.ToList().FindAll(x => x is TeleportEntrance)
-                    .ConvertAll(x => (TeleportEntrance)x))
+                foreach (TeleportEntrance entrance in EntranceHandler.I.TeleportEntrances)
                 {
                     if (entrance.goName == closestTp.name)
                     {
-                        soloPage.Owner.GetSavedData().entranceOverride = entrance.GetName();
+                        savedData.connectionOverride = entrance.GetName();
                         break;
                     }
                 }
             }
         }
+
+        PageHelpers.DrawEntranceRuleSavedData(savedData, ref selectedEntranceRule);
+    }
+
+    public override void UpdateOpen()
+    {
+        base.UpdateOpen();
+        if (!soloPage.OwnerSet) return;
+
+        if (soloPage.Owner is TeleportEntrance teleportEntrance)
+        {
+            if (GUILayout.Button($"Teleport to {(teleportEntrance.GetSavedData().overrideConnection || teleportEntrance.GetConnection() == null ? "Jank" : "")}"))
+                StartCoroutine(PageHelpers.LoadEntrance(teleportEntrance));
+        }
+        else if (soloPage.Owner is ElevatorEntrance elevatorEntrance && GUILayout.Button("Teleport to elevator"))
+            StartCoroutine(PageHelpers.LoadEntrance(elevatorEntrance));
 
         soloPage.UpdateOpen();
         EntranceHandler.I.Save(soloPage.Owner.GetSavedData(), log: false);

@@ -23,7 +23,7 @@ public class FoundryPipeLocation : ALocation
     {
         id = valve.PersistenceId;
 
-        CreateItem(valve, region);
+        baseItem = CreateItem(valve, region).GetName();
         LocationHandler.I.Save(this);
     }
 

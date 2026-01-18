@@ -14,8 +14,6 @@ public class ConStateAbility_Player_Transition_Patch
 {
     public static readonly ConCheckPointId startCheckpointId = new("cp_Prod_V01_7d6bf550-4ce0-11ef-a7cf-35ea7ade9f40");
 
-    public static bool ForceIntroSkip => true;
-
     [HarmonyPrefix]
     [HarmonyPatch(nameof(ConStateAbility_Player_Transition.StartTransitionIn), [typeof(IConTransitionCommand), typeof(float)])]
     private static void StartTransitionIn_Prefix()
@@ -27,15 +25,14 @@ public class ConStateAbility_Player_Transition_Patch
     [HarmonyPatch(nameof(ConStateAbility_Player_Transition.CompleteTransitionIn))]
     private static void CompleteTransitionIn_Postfix()
     {
-        if (!RandomStateHandler.Randomized && !ForceIntroSkip) return;
+        if (!RandomStateHandler.Randomized) return;
 
         string level = ConMonoBehaviour.SceneRegistry.PlayerOne.Level.Current.StringValue;
-        if (level == "Prod_Flashback_IntroCutscene" && (ForceIntroSkip || RandomFilesHandler.slotData.skipIntro))
+        if (level == "Prod_Flashback_IntroCutscene" && RandomFilesHandler.slotData.skipIntro)
         {
             Plugin.I.StartCoroutine(Skip());
             return;
         }
-        if (!RandomStateHandler.Randomized) return;
 
         RegionLivePatcher.PatchLoadedRegion();
         RandomStateHandler.readyForItems = true;

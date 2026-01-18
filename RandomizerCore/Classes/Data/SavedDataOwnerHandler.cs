@@ -110,8 +110,12 @@ public abstract class SavedDataOwnerHandler<T1, T2> where T1 : ISavedDataOwner<T
     public void Save(T1 data, bool log = true)
     {
         if (dataOwners.ContainsKey(data.GetName())) dataOwners[data.GetName()] = data;
-        else dataOwners.Add(data.GetName(), data);
+        else NewData(data);
         FileSaveLoader.TrySaveClassToFile(dataOwners.Values.ToList(), FolderPath, GetName(), logSuccess: log);
+    }
+    public virtual void NewData(T1 data)
+    {
+        dataOwners.Add(data.GetName(), data);
     }
     public void Save(T2 data, bool log = true)
     {

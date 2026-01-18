@@ -3,6 +3,7 @@ using BepInEx.Logging;
 using CheatMenu.Classes;
 using Constance;
 using CreateRandomizer.Classes;
+using CreateRandomizer.Classes.Pages;
 using CreateRandomizer.Classes.Pages.Entrances;
 using CreateRandomizer.Classes.Pages.Locations;
 using CreateRandomizer.Classes.Pages.Regions;
@@ -40,6 +41,7 @@ public class Plugin : BaseUnityPlugin
         modGUI.AddPage<RegionsPage>();
         modGUI.AddPage<LocationsRegionPage>();
         modGUI.AddPage<EntrancesRegionPage>();
+        modGUI.AddPage<CheatPage>();
     }
 
     private void Update()
@@ -68,6 +70,7 @@ public class Plugin : BaseUnityPlugin
         // Give all abilities and inspirations
         if (Keyboard.current.f5Key.wasPressedThisFrame)
         {
+            CollectableHandler.TrueInit();
             IConPlayerInventory inventoryManager = ConMonoBehaviour.SceneRegistry.Inventory;
             IConPlayerEntity player = ConMonoBehaviour.SceneRegistry.PlayerOne;
 

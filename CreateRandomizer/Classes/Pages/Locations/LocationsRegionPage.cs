@@ -31,6 +31,7 @@ public class LocationsRegionPage : GUIPage
         foreach (string locationName in region.locations)
         {
             ALocation location = LocationHandler.I.GetFromName(locationName);
+            if (!location.GetSavedData().used) continue;
             if (!location.GetSavedData().completed) return Color.red;
         }
         return null;

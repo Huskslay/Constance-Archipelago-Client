@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RandomizerCore.Classes.Enums;
+using System;
 using System.Collections.Generic;
 
 namespace RandomizerCore.Classes.Data.Types.Regions;
@@ -9,6 +10,7 @@ public class Region : ISavedDataOwner<RegionSavedData>
     public string name;
     public List<string> entrances = [];
     public List<string> locations = [];
+    public GameEvents givenEvents = GameEvents.None;
 
     public void Init() { }
     public string GetName() => $"{name}";

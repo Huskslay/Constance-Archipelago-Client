@@ -1,4 +1,5 @@
 ﻿using RandomizerCore.Classes.Components;
+using RandomizerCore.Classes.Data.Types.Items;
 using RandomizerCore.Classes.Data.Types.Regions;
 using RandomizerCore.Classes.Enums;
 using System;
@@ -14,10 +15,12 @@ public abstract class ALocation : ISavedDataOwner<ALocationSavedData>
     public string type;
     public string region;
     public string goName = "";
+    public string baseItem = "";
 
     public virtual void Init() { }
     public string GetName() => $"{type}-{name}-{region}-Location";
     public abstract Randomizable GetRandoType();
+    public Item BaseItem => ItemHandler.I.GetFromName(baseItem);
 
 
     public ALocation(string name, Region region, string goName)

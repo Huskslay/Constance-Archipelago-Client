@@ -1,7 +1,9 @@
 ﻿using CheatMenu.Classes;
 using Constance;
 using CreateRandomizer.Classes.Pages.Generic;
+using RandomizerCore.Classes.Data.Types.Items;
 using RandomizerCore.Classes.Data.Types.Locations;
+using RandomizerCore.Classes.Enums;
 using System.Linq;
 using UnityEngine;
 
@@ -18,6 +20,7 @@ public class LocationSoloPage : SoloGUIPage
         soloPage = new();
         base.Init(modGUI, parent, id);
         selectedEntranceRule = null;
+        windowRect = PageHelpers.NewSoloPageRect;
     }
 
     public void Open(ALocation location)
@@ -34,7 +37,23 @@ public class LocationSoloPage : SoloGUIPage
 
     private void DrawSavedData(ALocationSavedData savedData)
     {
-        PageHelpers.DrawEntranceRuleSavedData(savedData, ref selectedEntranceRule);
+        PageHelpers.DrawEntranceRuleSavedData(savedData, ref selectedEntranceRule, onIfUsed: () =>
+        {
+            Item item = soloPage.Owner.BaseItem;
+            if (item == null) GUILayout.Label("Could not find locations base item");
+            else DrawSavedData(item.GetSavedData());
+        });
+    }
+    private void DrawSavedData(ItemSavedData savedData)
+    {
+        GUILayout.Label($"Item-{savedData.connection}");
+
+        GUILayout.Label("Given items");
+        PageHelpers.EnumFlagButtons(ref savedData.givenItems, skip: (item) => item == KeyItems.None,
+            maxButtonsPerRow: PageHelpers.KeyItemsPerRow);
+        GUILayout.Label("Given collectables");
+        PageHelpers.EnumFlagButtons(ref savedData.givenCollectables, skip: (item) => item == CollectableItems.None,
+            maxButtonsPerRow: PageHelpers.KeyCollectablesPerRow);
     }
 
     public override void UpdateOpen()

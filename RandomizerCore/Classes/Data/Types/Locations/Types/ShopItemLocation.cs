@@ -17,7 +17,7 @@ public class ShopItemLocation : ALocation
 
     public ShopItemLocation(SConCollectable_ShopItem shopItem, Region region) : base(GetName(shopItem), region, shopItem.name)
     {
-        CreateItem(shopItem, region);
+        baseItem = CreateItem(shopItem, region).GetName();
         LocationHandler.I.Save(this);
     }
 

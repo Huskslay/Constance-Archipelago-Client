@@ -19,7 +19,7 @@ public class InspirationLocation : ALocation
 
     public InspirationLocation(CConInspirationTriggerBehaviour inspiration, Region region) : base(GetName(inspiration), region, inspiration.name)
     {
-        CreateItem(inspiration, region);
+        baseItem = CreateItem(inspiration, region).GetName();
         LocationHandler.I.Save(this);
     }
 

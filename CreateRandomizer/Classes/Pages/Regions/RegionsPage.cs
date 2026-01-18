@@ -22,7 +22,7 @@ public class RegionsPage : GUIPage
 
     public override void Open()
     {
-        page.Open(Name, [.. RegionHandler.I.dataOwners.Values], (x) => null);
+        page.Open(Name, [.. RegionHandler.I.dataOwners.Values], (x) => soloPage.Region == x ? Color.green : null);
     }
 
     public override void UpdateOpen()

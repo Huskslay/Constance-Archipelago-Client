@@ -18,7 +18,7 @@ public class PickupLocation : ALocation
 
     public PickupLocation(CConEntityDropBehaviour_TouchToCollect pickup, Region region) : base(GetName(pickup), region, pickup.name)
     {
-        CreateItem(pickup, region);
+        baseItem = CreateItem(pickup, region).GetName();
         LocationHandler.I.Save(this);
     }
 

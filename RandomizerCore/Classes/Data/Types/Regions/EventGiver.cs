@@ -3,13 +3,11 @@ using RandomizerCore.Classes.Enums;
 using System;
 using System.Collections.Generic;
 
-namespace RandomizerCore.Classes.Data.Saved;
+namespace RandomizerCore.Classes.Data.Types.Regions;
 
 [Serializable]
-public class EntranceRuleSavedData(string connection) : SavedData(connection)
+public class EventGiver(GameEvents gameEvent)
 {
-    public bool completed = false;
-    public bool used = true;
-
+    public GameEvents gameEvent = gameEvent;
     public EntranceRules entranceRules = new();
 }

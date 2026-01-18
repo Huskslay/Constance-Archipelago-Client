@@ -1,6 +1,7 @@
 ﻿using CheatMenu.Classes;
 using CreateRandomizer.Classes.Pages.Generic;
 using RandomizerCore.Classes.Data.Types.Entrances;
+using RandomizerCore.Classes.Data.Types.Entrances.Types;
 using RandomizerCore.Classes.Data.Types.Regions;
 using UnityEngine;
 
@@ -28,12 +29,16 @@ public class EntrancesRegionPage : GUIPage
 
     private Color? GetColor(Region region)
     {
+        Color? color = null;
         foreach (string entranceName in region.entrances)
         {
             AEntrance entrance = EntranceHandler.I.GetFromName(entranceName);
-            if (!entrance.GetSavedData().completed) return Color.red;
+            if (!entrance.GetSavedData().used) continue;
+            if (entrance is TeleportEntrance teleportEntrance && teleportEntrance.GetConnection() == null)
+                return Color.magenta;
+            if (!entrance.GetSavedData().completed) color = Color.red;
         }
-        return null;
+        return color;
     }
 
     public override void UpdateOpen()

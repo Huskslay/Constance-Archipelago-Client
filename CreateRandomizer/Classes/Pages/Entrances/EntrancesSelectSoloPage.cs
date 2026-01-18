@@ -1,6 +1,7 @@
 ﻿using CheatMenu.Classes;
 using CreateRandomizer.Classes.Pages.Generic;
 using RandomizerCore.Classes.Data.Types.Entrances;
+using RandomizerCore.Classes.Data.Types.Entrances.Types;
 using RandomizerCore.Classes.Data.Types.Regions;
 using UnityEngine;
 
@@ -34,7 +35,9 @@ public class EntrancesSelectSoloPage : SoloGUIPage
 
     private Color? GetColor(AEntrance entrance)
     {
-        return entrance.GetSavedData().completed ? null : Color.red;
+        if (entrance is TeleportEntrance teleportEntrance && teleportEntrance.GetConnection() == null)
+            return Color.magenta;
+        return !entrance.GetSavedData().used || entrance.GetSavedData().completed ? null : Color.red;
     }
 
     public override void UpdateOpen()

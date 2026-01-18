@@ -21,7 +21,8 @@ public class TeleportEntrance(string name, Region region,
 
     public TeleportEntrance GetConnection()
     {
-        if (GetSavedData().overrideEntrance) connectionName = GetSavedData().entranceOverride;
+        string connectionName = this.connectionName;
+        if (GetSavedData().overrideConnection) connectionName = GetSavedData().connectionOverride;
         if (connectionName == null) return null;
 
         AEntrance connection = EntranceHandler.I.GetFromName(connectionName);

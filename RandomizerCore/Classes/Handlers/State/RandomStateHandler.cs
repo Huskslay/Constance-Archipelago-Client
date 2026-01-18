@@ -97,9 +97,10 @@ public static class RandomStateHandler
     }
     public static void AchieveEvents(GameEvents events)
     {
+        Plugin.Logger.LogMessage($"Achieved events: {events}");
         DataStorage.FoundEvent(events);
     }
-
+    
 
     // Called by MultiClient when a location is recieved from the ap
     public static void GetLocation(string locationName)

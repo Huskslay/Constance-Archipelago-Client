@@ -6,12 +6,12 @@ namespace RandomizerCore.Classes.Enums;
 public enum KeyItems : ulong
 {
     None = 0,
-    Dash = 1 << 0,
-    Stab = 1 << 1,
-    WallDive = 1 << 2,
-    Pogo = 1 << 3,
-    Slice = 1 << 4,
-    BombClone = 1 << 5,
-    DoubleJump = 1 << 6,
-    TpInspiration = 1 << 7
+    Dash = 1UL << 0,
+    Stab = 1UL << 1,
+    WallDive = 1UL << 2,
+    Pogo = 1UL << 3,
+    Slice = 1UL << 4,
+    BombClone = 1UL << 5,
+    DoubleJump = 1UL << 6,
+    TpInspiration = 1UL << 7
 }

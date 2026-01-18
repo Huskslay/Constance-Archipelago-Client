@@ -16,7 +16,7 @@ public class TearLocation : ALocation
 
     public TearLocation(SConCollectable tear, Region region) : base(GetName(tear), region, tear.name)
     {
-        CreateItem(tear, region);
+        baseItem = CreateItem(tear, region).GetName();
         LocationHandler.I.Save(this);
     }
 

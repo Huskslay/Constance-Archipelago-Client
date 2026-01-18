@@ -3,7 +3,6 @@ using RandomizerCore.Classes.Data.Types.Entrances;
 using RandomizerCore.Classes.Data.Types.Entrances.Types;
 using RandomizerCore.Classes.Data.Types.Items;
 using RandomizerCore.Classes.Data.Types.Regions;
-using System.Collections.Generic;
 
 namespace CreateRandomizer.Classes;
 
@@ -37,10 +36,8 @@ public static class DataConverter
 
     public static void EntranceData()
     {
-        string output = "# name, parent, connection\n";
-        List<AEntrance> entrances = [.. EntranceHandler.I.dataOwners.Values];
-        foreach (TeleportEntrance entrance in entrances.FindAll(x => x.GetType() == typeof(TeleportEntrance))
-            .ConvertAll(x => (TeleportEntrance)x))
+        string output = "# name, region, connection, connectionRegion\n";
+        foreach (TeleportEntrance entrance in EntranceHandler.I.TeleportEntrances)
         {
             TeleportEntrance connection = entrance.GetConnection();
 
@@ -48,13 +45,12 @@ public static class DataConverter
                 $"\"{entrance.GetName()}\", " +
                 $"\"{entrance.region}\", " +
                 $"\"{(connection == null ? "null" : connection.GetName())}\", " +
+                $"\"{(connection == null ? "null" : connection.region)}\", " +
             $")\n";
         }
-        List<ElevatorEntrance> elevators = entrances.FindAll(x => x.GetType() == typeof(ElevatorEntrance))
-            .ConvertAll(x => (ElevatorEntrance)x);
-        foreach (ElevatorEntrance elevator1 in elevators)
+        foreach (ElevatorEntrance elevator1 in EntranceHandler.I.ElevatorEntrances)
         {
-            foreach (ElevatorEntrance elevator2 in elevators)
+            foreach (ElevatorEntrance elevator2 in EntranceHandler.I.ElevatorEntrances)
             {
                 if (elevator1 == elevator2) continue;
                 output += $"{elevator1.region}_{elevator2.region}_Elevator = (" +

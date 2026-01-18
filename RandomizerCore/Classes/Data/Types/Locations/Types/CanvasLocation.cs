@@ -19,7 +19,7 @@ public class CanvasLocation : ALocation
 
     public CanvasLocation(CConUnlockAbilityCanvas canvas, Region region) : base(GetName(canvas), region, canvas.name)
     {
-        CreateItem(canvas, region);
+        baseItem = CreateItem(canvas, region).GetName();
         LocationHandler.I.Save(this);
     }
 

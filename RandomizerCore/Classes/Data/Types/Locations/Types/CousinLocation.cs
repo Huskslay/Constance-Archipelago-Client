@@ -28,7 +28,7 @@ public class CousinLocation : ALocation
         id = cousin.GetLevelId();
         questIntel = cousin.config.shopKeeperData.ToList().Find(x => x.levelId == id).questIntel;
 
-        CreateItem(cousin, region);
+        baseItem = CreateItem(cousin, region).GetName();
         LocationHandler.I.Save(this);
     }
 
