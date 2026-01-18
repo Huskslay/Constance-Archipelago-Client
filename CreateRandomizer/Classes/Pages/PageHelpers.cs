@@ -2,6 +2,7 @@
 using Constance;
 using RandomizerCore.Classes.Data.Rules;
 using RandomizerCore.Classes.Data.Saved;
+using RandomizerCore.Classes.Data.Types.Entrances;
 using RandomizerCore.Classes.Data.Types.Entrances.Types;
 using RandomizerCore.Classes.Data.Types.Locations;
 using RandomizerCore.Classes.Data.Types.Regions;
@@ -100,6 +101,12 @@ public static class PageHelpers
 
     public static void DrawEntranceRule(ref EntranceRule entranceRule)
     {
+        PageHelpers.LoadEntranceButton(EntranceHandler.I.GetFromName(entranceRule.entrance));
+        GreenRedButton("Possible", ref entranceRule.possible);
+        if (!entranceRule.possible) return;
+
+        GUIElements.ElipseLine();
+
         foreach (Rule rule in entranceRule.rules)
         {
             GUIElements.ElipseLine();
@@ -174,6 +181,16 @@ public static class PageHelpers
 
 
 
+    public static void LoadEntranceButton(AEntrance entrance)
+    {
+        if (entrance is TeleportEntrance teleportEntrance)
+        {
+            if (GUILayout.Button($"Teleport to {(teleportEntrance.GetSavedData().overrideConnection || teleportEntrance.GetConnection() == null ? "Jank" : "")}"))
+                Plugin.I.StartCoroutine(PageHelpers.LoadEntrance(teleportEntrance));
+        }
+        else if (entrance is ElevatorEntrance elevatorEntrance && GUILayout.Button("Teleport to elevator"))
+            Plugin.I.StartCoroutine(PageHelpers.LoadEntrance(elevatorEntrance));
+    }
     public static IEnumerator LoadEntrance(TeleportEntrance entrance)
     {
         TeleportEntrance connection = entrance.GetConnection();

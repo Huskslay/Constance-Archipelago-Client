@@ -5,7 +5,6 @@ using RandomizerCore.Classes.Data.Types.Entrances;
 using RandomizerCore.Classes.Data.Types.Entrances.Types;
 using RandomizerCore.Classes.Enums;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -39,13 +38,6 @@ public class EntrancesSoloPage : SoloGUIPage
 
     private void DrawSavedData(AEntranceSavedData savedData)
     {
-        savedData.lockState = GUIElements.ListValue("Lock State", savedData.lockState, 
-            (IEnumerable<EntranceLockState>)Enum.GetValues(typeof(EntranceLockState)), 
-            (previous, check, _) => previous == check, (value) => value.ToString()
-        );
-
-        GUIElements.ElipseLine();
-
         savedData.overrideConnection = GUIElements.BoolValue("Override connection", savedData.overrideConnection);
         if (savedData.overrideConnection)
         {
@@ -77,6 +69,13 @@ public class EntrancesSoloPage : SoloGUIPage
             }
         }
 
+        GUIElements.ElipseLine();
+
+        savedData.lockState = GUIElements.ListValue("Lock State", savedData.lockState,
+            (IEnumerable<EntranceLockState>)Enum.GetValues(typeof(EntranceLockState)),
+            (previous, check, _) => previous == check, (value) => value.ToString()
+        );
+
         PageHelpers.DrawEntranceRuleSavedData(savedData, ref selectedEntranceRule);
     }
 
@@ -85,13 +84,7 @@ public class EntrancesSoloPage : SoloGUIPage
         base.UpdateOpen();
         if (!soloPage.OwnerSet) return;
 
-        if (soloPage.Owner is TeleportEntrance teleportEntrance)
-        {
-            if (GUILayout.Button($"Teleport to {(teleportEntrance.GetSavedData().overrideConnection || teleportEntrance.GetConnection() == null ? "Jank" : "")}"))
-                StartCoroutine(PageHelpers.LoadEntrance(teleportEntrance));
-        }
-        else if (soloPage.Owner is ElevatorEntrance elevatorEntrance && GUILayout.Button("Teleport to elevator"))
-            StartCoroutine(PageHelpers.LoadEntrance(elevatorEntrance));
+        PageHelpers.LoadEntranceButton(soloPage.Owner);
 
         soloPage.UpdateOpen();
         EntranceHandler.I.Save(soloPage.Owner.GetSavedData(), log: false);

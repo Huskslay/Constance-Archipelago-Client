@@ -41,22 +41,23 @@ public class Plugin : BaseUnityPlugin
         modGUI.AddPage<RegionsPage>();
         modGUI.AddPage<LocationsRegionPage>();
         modGUI.AddPage<EntrancesRegionPage>();
-        modGUI.AddPage<CheatPage>();
+        modGUI.AddPage<UtilitiesPage>();
     }
 
     private void Update()
     {
         if (Keyboard.current.f1Key.wasPressedThisFrame)
         {
-            GameScraper.Scrape();
-        }
-        if (Keyboard.current.f2Key.wasPressedThisFrame)
-        {
-            DataConverter.Convert();
-        }
-        if (Keyboard.current.f3Key.wasPressedThisFrame)
-        {
             modGUI.ShowGUI = !modGUI.ShowGUI;
+        }
+
+
+        // Heal
+        if (Keyboard.current.f4Key.wasPressedThisFrame)
+        {
+            IConPlayerEntity player = ConMonoBehaviour.SceneRegistry.PlayerOne;
+            player.HealFully();
+            player.RefillPaint();
         }
 
         // Fly
@@ -82,14 +83,6 @@ public class Plugin : BaseUnityPlugin
                 inventoryManager.Collect(player, CollectableHandler.dict[CollectableHandler.nameDict[ability]], 1);
             foreach (SConCollectable_InspirationDrawing inspiration in CollectableHandler.inspirationCollectables)
                 inventoryManager.Collect(player, inspiration, 1);
-        }
-
-        // Heal
-        if (Keyboard.current.f4Key.wasPressedThisFrame)
-        {
-            IConPlayerEntity player = ConMonoBehaviour.SceneRegistry.PlayerOne;
-            player.HealFully();
-            player.RefillPaint();
         }
     }
 }

@@ -18,6 +18,7 @@ public static class ShrineDataHandler
         regions = FileSaveLoader.LoadClassFromJson<List<string>>(["Output"], "shrines");
         GameDataActions.OnFileSave.AddListener(SaveShrineData);
         GameDataActions.OnFileDelete.AddListener(DeleteShrineData);
+        GameDataActions.OnFileQuit.AddListener(() => loadedData = null);
     }
 
     public static void UpdateShrineData(string region, bool unlocked = true)

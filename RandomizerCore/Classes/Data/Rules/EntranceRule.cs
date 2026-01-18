@@ -8,5 +8,6 @@ namespace RandomizerCore.Classes.Data.Rules;
 public class EntranceRule(string entrance)
 {
     public string entrance = entrance;
+    public bool possible = true;
     public List<Rule> rules = [];
 }
