@@ -36,7 +36,7 @@ public static class ShrineDataHandler
 
     public static void SaveShrineData(ConSaver conSaver, ConSaveStateId id)
     {
-        if (loadedData == null) NewShrineData();
+        if (loadedData == null) return;
         FileSaveLoader.TrySaveClassToJson(loadedData, folders, file, id);
         loadedData = null;
     }
